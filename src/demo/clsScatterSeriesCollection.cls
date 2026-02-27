@@ -9,15 +9,50 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-'Private items_ As New Dictionary
+'---------------------------------------------------------------
+' éUïzê}ånóÒÉRÉåÉNÉVÉáÉì
+'---------------------------------------------------------------
+
 Private items_ As Object
+Private chartType_ As enChartType
+Private isSmooth_ As Boolean
 
 Private Sub Class_Initialize()
     Set items_ = CreateObject("Scripting.Dictionary")
 End Sub
 
+' --- chartType ---
+Public Property Get ChartType() As enChartType
+    ChartType = chartType_
+End Property
+
+Public Property Let ChartType(ByVal newChartType As enChartType)
+    chartType_ = newChartType
+    
+    Dim i As Integer
+    
+    For i = 1 To Me.Count
+        Item(i).ChartType = Me.ChartType
+    Next
+End Property
+
+' --- isSmooth ---
+Public Property Get IsSmooth() As Boolean
+    IsSmooth = isSmooth_
+End Property
+
+Public Property Let IsSmooth(ByVal newIsSmooth As Boolean)
+    isSmooth_ = newIsSmooth
+    
+    Dim i As Integer
+    
+    For i = 1 To Me.Count
+        Item(i).IsSmooth = Me.IsSmooth
+    Next
+End Property
+
 Public Sub Add(ByVal s As clsScatterSeries)
-    items_.Add s.index, s
+    items_.Add s.Index, s
 End Sub
 
 Public Sub Remove(ByVal seriesIdx As Long)
@@ -52,9 +87,11 @@ Public Sub LoadFromSeriesCollection(ByVal targetSC As SeriesCollection)
     Dim scatterSeries As clsScatterSeries
     
     For i = 1 To targetSC.Count
-        Set scatterSeries = New clsScatterSeries
-        scatterSeries.LoadFromSeries i, targetSC(i)
-        items_.Add i, scatterSeries
+        If targetSC(i).Name <> DUMMY_SERIES_NAME Then
+            Set scatterSeries = New clsScatterSeries
+            scatterSeries.LoadFromSeries i, targetSC(i)
+            items_.Add i, scatterSeries
+        End If
     Next
 
 End Sub
@@ -63,7 +100,7 @@ Public Sub ApplyTo(ByRef targetChart As Chart)
 
     Dim i As Integer
     
-    For i = 1 To targetChart.SeriesCollection.Count
+    For i = 1 To Me.Count
         Me.Item(i).ApplyTo targetChart.SeriesCollection(i)
     Next
 

@@ -9,7 +9,10 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
+'---------------------------------------------------------------
 ' プロットエリア設定
+'---------------------------------------------------------------
+
 Private height_ As Double
 Private width_ As Double
 Private top_ As Double
@@ -64,24 +67,40 @@ Public Sub ApplyTo(ByRef targetChart As Chart)
 
     With targetChart.PlotArea
         
-        ' 現状固定
+        ' 固定
         .Format.Fill.Visible = msoTrue
         .Format.Fill.ForeColor.RGB = RGB(255, 255, 255)
         .Format.Line.Visible = msoTrue
         .Format.Line.ForeColor.RGB = RGB(0, 0, 0)
         .Format.Line.Weight = 1.5
         
+        WaitUntilStable targetChart
+        
         ' リセット
-        .Top = 0
-        .Left = 0
-        .Height = 1
-        .Width = 1
+        .InsideTop = 1
+        .InsideLeft = 1
+        .InsideHeight = 1
+        .InsideWidth = 1
+        
+        WaitUntilStable targetChart
         
         ' プロパティ
-        .Top = Me.Top
-        .Left = Me.Left
-        .Height = Me.Height
-        .Width = Me.Width
+        .InsideTop = Me.Top
+        .InsideLeft = Me.Left
+        .InsideHeight = Me.Height
+        .InsideWidth = Me.Width
     End With
+
+End Sub
+
+Private Sub WaitUntilStable(ByRef targetChart As Chart)
+
+    ' レイアウト確定まで待機(max 3s)
+    Dim dbl As Double
+    
+    dbl = Timer
+    Do Until targetChart.PlotArea.InsideTop <> 0 Or Timer - dbl > 3
+        Debug.Print "waiting"
+    Loop
 
 End Sub
