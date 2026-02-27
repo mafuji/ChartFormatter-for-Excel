@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmChargeDischargeChartBuilder 
    Caption         =   "充放電グラフ作成"
-   ClientHeight    =   4875
+   ClientHeight    =   4872
    ClientLeft      =   120
-   ClientTop       =   465
-   ClientWidth     =   10005
+   ClientTop       =   468
+   ClientWidth     =   10008
    OleObjectBlob   =   "frmChargeDischargeChartBuilder.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -485,11 +485,13 @@ Private Sub btnExecute_Click()
     End If
 
     ' Chart作成実行
+    Application.Cursor = xlWait
+    
     chargeDischargeChart.CreateChart
     If chargeDischargeChart.targetChart.SeriesCollection.Count <= 0 Then
         chargeDischargeChart.DeleteChart
         MsgBox "データが正しくセットされませんでした。グラフ作成が失敗しました。", vbExclamation
-        Exit Sub
+        GoTo Exit_Proc
     End If
     
     ' フォーマットクラス生成
@@ -524,7 +526,7 @@ Private Sub btnExecute_Click()
         .IsAutoScaleX = False
         .IsAutoScaleY = False
         .marginModeX = ammFitBoth
-        .marginModeY = ammExpandMax
+        .marginModeY = ammFitBoth
     End With
     
     ' フォーマット適用
@@ -534,6 +536,13 @@ Private Sub btnExecute_Click()
     ActiveWindow.ScrollColumn = 1
     ActiveWindow.ScrollRow = 1
     Unload Me
+    
+    Application.Cursor = xlDefault
+    
+    MsgBox "完了しました。", vbInformation
+
+Exit_Proc:
+    Application.Cursor = xlDefault
 
 End Sub
 
