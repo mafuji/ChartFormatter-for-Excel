@@ -1,6 +1,7 @@
-Attribute VB_Name = "AddinManager"
+Attribute VB_Name = "modAddinManager"
 Option Explicit
 
+' アドインファイル名を変えれば汎用的に使用可能
 Public Const ADDIN_NAME As String = "ChartFormatter.xlam"
 
 Public Sub InstallAddin()
@@ -38,7 +39,8 @@ Private Function CopyXlamToUserAddIns(ByVal srcName As String) As Boolean
     
     ' 事前チェック
     If Len(Dir$(srcPath, vbNormal)) = 0 Then
-        MsgBox "コピー元が見つかりません。" & vbCrLf & srcPath, vbExclamation, "CopyXlamToUserAddIns"
+        MsgBox "コピー元が見つかりません。" & ADDIN_NAME & "をこのファイルと同じフォルダに配置して再度実行してください。" & _
+                vbCrLf & srcPath, vbExclamation, "CopyXlamToUserAddIns"
         Exit Function
     End If
     

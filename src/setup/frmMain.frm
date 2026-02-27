@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmMain 
    Caption         =   "ChartFromatterSetup"
-   ClientHeight    =   3768
+   ClientHeight    =   3765
    ClientLeft      =   120
    ClientTop       =   465
    ClientWidth     =   7305
@@ -26,7 +26,7 @@ Private Sub UserForm_Initialize()
         btnUninstall.Visible = True
         btnInstall.Caption = "Update"
         lblGuid.Caption = _
-            "ChartFormatterアドインが以下の場所にインストール済みです。" & vbCrLf & vbCrLf & _
+            ADDIN_NAME & "アドインが以下の場所にインストール済みです。" & vbCrLf & vbCrLf & _
             Application.UserLibraryPath & ADDIN_NAME & vbCrLf & vbCrLf & _
             "＜操作＞" & vbCrLf & _
             "Uninstall：アドイン登録を解除し、上記のファイルを削除します。" & vbCrLf & _
@@ -36,7 +36,7 @@ Private Sub UserForm_Initialize()
         btnUninstall.Visible = False
         btnInstall.Caption = "Install"
         lblGuid.Caption = _
-            "InstallボタンでChartFormatterアドインをインストールします。" & vbCrLf & vbCrLf & _
+            "Installボタンで" & ADDIN_NAME & "アドインをインストールします。" & vbCrLf & vbCrLf & _
             "保存先：" & Application.UserLibraryPath & ADDIN_NAME & vbCrLf & _
             "コピー元：" & ThisWorkbook.Path & Application.PathSeparator & ADDIN_NAME
     End If
@@ -49,13 +49,13 @@ Private Sub btnInstall_Click()
     
     If isInstalled Then
         ' アップデート
-        msg = "ChartFormatterアドインを更新します。よろしいですか？"
+        msg = ADDIN_NAME & "アドインを更新します。よろしいですか？"
         If MsgBox(msg, vbYesNo + vbQuestion) = vbNo Then Exit Sub
         DisableAddIn ADDIN_NAME
         InstallAddin
     Else
         ' インストール
-        msg = "ChartFormatterアドインをインストールします。よろしいですか？"
+        msg = ADDIN_NAME & "アドインをインストールします。よろしいですか？"
         If MsgBox(msg, vbYesNo + vbQuestion) = vbNo Then Exit Sub
         InstallAddin
     End If
@@ -70,7 +70,7 @@ Private Sub btnUninstall_Click()
     Dim msg As String
     
     ' アンインストール処理
-    msg = "ChartFormatterアドインをアンインストールします。よろしいですか？"
+    msg = ADDIN_NAME & "アドインをアンインストールします。よろしいですか？"
     If MsgBox(msg, vbYesNo + vbQuestion) = vbNo Then Exit Sub
     UninstallAddin
     TerminateMe

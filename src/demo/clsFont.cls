@@ -9,15 +9,18 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-' フォント設定
+'---------------------------------------------------------------
+' グラフのフォント設定
+'---------------------------------------------------------------
+
 Private fontName_ As String
 Private size_ As Single
 
-Public Property Get fontName() As String
-    fontName = fontName_
+Public Property Get FontName() As String
+    FontName = fontName_
 End Property
 
-Public Property Let fontName(ByVal newFontName As String)
+Public Property Let FontName(ByVal newFontName As String)
     fontName_ = newFontName
 End Property
 
@@ -33,7 +36,7 @@ Public Function Clone() As clsFont
 
     Dim c As New clsFont
 
-    c.fontName = Me.fontName
+    c.FontName = Me.FontName
     c.Size = Me.Size
 
     Set Clone = c
@@ -42,10 +45,10 @@ End Function
 
 Public Sub ApplyTo(ByRef targetChart As Chart)
     
-    With targetChart.ChartArea.Format.TextFrame2.TextRange.font
-        .NameComplexScript = Me.fontName
-        .NameFarEast = Me.fontName
-        .Name = Me.fontName
+    With targetChart.ChartArea.Format.TextFrame2.TextRange.Font
+        .NameComplexScript = Me.FontName
+        .NameFarEast = Me.FontName
+        .Name = Me.FontName
         .Size = Me.Size
         .Fill.ForeColor.RGB = RGB(0, 0, 0)
     End With
