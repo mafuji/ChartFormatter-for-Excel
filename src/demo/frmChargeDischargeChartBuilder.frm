@@ -43,8 +43,8 @@ Private Sub UserForm_Initialize()
     chargeDischargeChart.StartStep = IIf(optCharge, Charge, Discharge)
     
     ' 色の既定設定
-    txtStartHue = 300
-    txtEndHue = 0
+    txtStartHue = 0
+    txtEndHue = 300
     txtSat = 1
     txtVal = 0.85
     lblStartHue.ForeColor = colorPalette.MakeHueGradientColors(1, txtStartHue)(0)
@@ -475,6 +475,14 @@ Private Sub btnExecute_Click()
     If chargeDischargeChart.CycleCount <= 0 Then
         MsgBox "サイクル数を入力して下さい。", vbExclamation
         Exit Sub
+    End If
+    
+    ' N >= サイクル数を保証
+    If IsNumeric(txtN) Then
+        If val(txtN) < val(txtCycle) Then
+            MsgBox "色の分割数はサイクル数以上にしてください。", vbExclamation
+            Exit Sub
+        End If
     End If
     
     ' 行数違い確認
