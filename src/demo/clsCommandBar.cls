@@ -72,7 +72,7 @@ Public Sub CreateBar()
     Dim bar As CommandBar, btn As CommandBarButton
     
     With Me
-        Set bar = Application.CommandBars.Add(Name:=.BarName, Position:=msoBarTop, Temporary:=True)
+        Set bar = Application.CommandBars.Add(Name:=.BarName, position:=msoBarTop, Temporary:=True)
         Set btn = bar.Controls.Add(Type:=msoControlButton)
         btn.Caption = .Caption
         btn.OnAction = .OnAction

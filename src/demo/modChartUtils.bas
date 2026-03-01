@@ -38,6 +38,20 @@ Public Enum axisTypeUsage
     atuOnlyY
 End Enum
 
+' カラーバーラベル位置
+Public Enum LabelPosition
+    lpRight = 0
+    lpLeft = 1
+    lpTop = 2
+    lpBottom = 3
+End Enum
+
+' カラーバーラベル表示モード
+Public Enum LabelMode
+    lmAll = 0
+    lmMinMax = 1
+End Enum
+
 Public Function GetChartExtents(ByVal ch As Chart, ByVal targetAxis As AxisGroupUsage) As ChartExtents
     Dim r As ChartExtents
     Dim s As Series
@@ -145,7 +159,7 @@ Private Function SeriesValuesToArray(ByVal v As Variant) As Variant
         ReDim resultArr(1 To CLng(v.Cells.CountLarge)) As Variant
         For Each c In v.Cells
             cnt = cnt + 1
-            resultArr(cnt) = c.Value
+            resultArr(cnt) = c.value
         Next
         SeriesValuesToArray = resultArr
         Exit Function
@@ -255,7 +269,7 @@ Function GetColumnLetter(rng As range) As String
     Dim m As Object
     If re.test(rng.Address(False, False)) Then
         Set m = re.Execute(rng.Address(False, False))(0)
-        GetColumnLetter = m.Value
+        GetColumnLetter = m.value
     End If
 End Function
 

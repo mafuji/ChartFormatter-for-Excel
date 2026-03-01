@@ -92,3 +92,43 @@ Public Function IsValidColumnKeyPress(ByRef KeyAscii As MSForms.ReturnInteger, B
     End Select
 
 End Function
+
+' 数字を "1st", "2nd", "3rd", "4th" のような表記に変換
+Public Function ToOrdinal(ByVal v As Variant) As String
+    Dim n As Long
+    Dim suffix As String
+    Dim absN As Long
+    Dim lastTwo As Long
+    Dim lastOne As Long
+    Dim sign As String
+    
+    ' 数値チェック
+    If IsNull(v) Or Not IsNumeric(v) Then
+        ToOrdinal = ""
+        Exit Function
+    End If
+    
+    ' 符号保持（-1 → "-1st" など）
+    sign = IIf(CDbl(v) < 0, "-", "")
+    
+    ' 小数は整数部で判定（例：21.9 → 21st）
+    n = Fix(CDbl(v))           ' Fixは0方向に丸め（-1.7→-1）
+    absN = Abs(n)
+    
+    ' 11,12,13 は常に "th"
+    lastTwo = absN Mod 100
+    lastOne = absN Mod 10
+    
+    If lastTwo >= 11 And lastTwo <= 13 Then
+        suffix = "th"
+    Else
+        Select Case lastOne
+            Case 1: suffix = "st"
+            Case 2: suffix = "nd"
+            Case 3: suffix = "rd"
+            Case Else: suffix = "th"
+        End Select
+    End If
+    
+    ToOrdinal = sign & CStr(absN) & suffix
+End Function

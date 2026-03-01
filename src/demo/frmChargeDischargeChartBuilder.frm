@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmChargeDischargeChartBuilder 
    Caption         =   "充放電グラフ作成"
-   ClientHeight    =   4872
+   ClientHeight    =   5388
    ClientLeft      =   120
    ClientTop       =   468
    ClientWidth     =   10008
@@ -174,8 +174,8 @@ Private Sub btnSetStartCells_Click()
     Dim rng As range
     
     Set rng = range(txtStepColumn & txtDataStartRow)
-    Do Until val(rng) = val(cmbStartStep.Value) Or rng = ""
-        Set rng = rng.Offset(1)
+    Do Until val(rng) = val(cmbStartStep.value) Or rng = ""
+        Set rng = rng.offset(1)
     Loop
     If rng = "" Then
         MsgBox "開始ステップが見つかりませんでした。", vbExclamation
@@ -343,7 +343,7 @@ End Sub
 
 Private Sub txtCycle_AfterUpdate()
 
-    chargeDischargeChart.CycleCount = txtCycle.Value
+    chargeDischargeChart.CycleCount = txtCycle.value
     
 End Sub
 
@@ -517,12 +517,12 @@ Private Sub btnExecute_Click()
     
     With chartFormat_.Series
         gradColors = colorPalette.MakeHueGradientColors( _
-            IIf(txtN = "", .Count / 2, txtN.Value), _
-            startHue:=IIf(txtStartHue = "", 300, txtStartHue.Value), _
-            endHue:=IIf(txtEndHue = "", 0, txtEndHue.Value), _
-            sat:=IIf(txtSat = "", 1, txtSat.Value), _
-            val:=IIf(txtVal = "", 0.85, txtVal.Value), _
-            shortestPath:=chkShortest.Value _
+            IIf(txtN = "", .Count / 2, txtN.value), _
+            startHue:=IIf(txtStartHue = "", 300, txtStartHue.value), _
+            endHue:=IIf(txtEndHue = "", 0, txtEndHue.value), _
+            sat:=IIf(txtSat = "", 1, txtSat.value), _
+            val:=IIf(txtVal = "", 0.85, txtVal.value), _
+            shortestPath:=chkShortest.value _
         )
         For i = 1 To .Count
             .Item(i).LineColor = gradColors(Int((i + 1) / 2) - 1)
@@ -539,6 +539,15 @@ Private Sub btnExecute_Click()
     
     ' フォーマット適用
     chartFormat_.ApplyTo chargeDischargeChart.targetChart
+    
+    ' カラーバー作成
+    With chargeDischargeChart.ColorBar
+        Set .LabelFont = chartFormat_.Font
+        .LabelMode = lmMinMax
+        .LabelPosition = lpTop
+        .Reverse = False
+    End With
+    chargeDischargeChart.DrawColorBar gradColors
     
     ' 完了
     ActiveWindow.ScrollColumn = 1

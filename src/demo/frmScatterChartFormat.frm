@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmScatterChartFormat 
    Caption         =   "散布図整形"
-   ClientHeight    =   5145
+   ClientHeight    =   5136
    ClientLeft      =   108
    ClientTop       =   456
    ClientWidth     =   10464
@@ -55,7 +55,7 @@ Private Sub UserForm_Activate()
     If cmbFont.ListCount < 1 Then
         cmbFont.AddItem DEFAULT_FONT_NAME
     End If
-    cmbFont.Value = chartFormat_.Font.FontName
+    cmbFont.value = chartFormat_.Font.FontName
 
     ' フォントサイズ一覧
     Dim sizes As Variant
@@ -63,7 +63,7 @@ Private Sub UserForm_Activate()
     For i = LBound(sizes) To UBound(sizes)
         Me.cmbFontSize.AddItem sizes(i)
     Next i
-    cmbFontSize.Value = chartFormat_.Font.Size
+    cmbFontSize.value = chartFormat_.Font.Size
 
     ' 凡例
     optHasLegend = chartFormat_.HasLegend
@@ -71,11 +71,11 @@ Private Sub UserForm_Activate()
     ' 系列リスト初期設定
     lstSeries.ColumnWidths = _
         "0;" & _
-        lblListHeaderName.Width & ";" & _
-        lblListHeaderDataColumn.Width & ";" & _
-        lblListHeaderColor.Width & ";" & _
-        lblListHeaderSize.Width & ";" & _
-        lblListHeaderSecond.Width
+        lblListHeaderName.width & ";" & _
+        lblListHeaderDataColumn.width & ";" & _
+        lblListHeaderColor.width & ";" & _
+        lblListHeaderSize.width & ";" & _
+        lblListHeaderSecond.width
     ToggleType ' グラフ種類に応じた設定
     
     ' Scale
@@ -173,8 +173,8 @@ End Sub
 Private Sub chkSecondAxis_AfterUpdate()
 
     With selectedSeries
-        .useSecondAxis = chkSecondAxis.Value
-        lstSeries.List(selectedListIdx, enSeriesListCol.useSecondAxis_) = IIf(chkSecondAxis.Value, "○", "")
+        .useSecondAxis = chkSecondAxis.value
+        lstSeries.List(selectedListIdx, enSeriesListCol.useSecondAxis_) = IIf(chkSecondAxis.value, "○", "")
     End With
 
 End Sub
@@ -279,13 +279,13 @@ End Sub
 ' フォント
 Private Sub cmbFont_AfterUpdate()
 
-    chartFormat_.Font.FontName = cmbFont.Value
+    chartFormat_.Font.FontName = cmbFont.value
 
 End Sub
 
 Private Sub cmbFontSize_AfterUpdate()
 
-    chartFormat_.Font.Size = cmbFontSize.Value
+    chartFormat_.Font.Size = cmbFontSize.value
 
 End Sub
 
@@ -331,7 +331,7 @@ Private Sub optNiceX_AfterUpdate()
 
     cmbMarginModeX.Enabled = (optNiceX = True)
     chartFormat_.IsAutoScaleX = False
-    chartFormat_.marginModeX = cmbMarginModeX.Value
+    chartFormat_.marginModeX = cmbMarginModeX.value
 
 End Sub
 
@@ -339,19 +339,19 @@ Private Sub optNiceY_AfterUpdate()
 
     cmbMarginModeY.Enabled = (optNiceY = True)
     chartFormat_.IsAutoScaleY = False
-    chartFormat_.marginModeY = cmbMarginModeY.Value
+    chartFormat_.marginModeY = cmbMarginModeY.value
     
 End Sub
 
 Private Sub cmbMarginModeX_AfterUpdate()
 
-    chartFormat_.marginModeX = cmbMarginModeX.Value
+    chartFormat_.marginModeX = cmbMarginModeX.value
 
 End Sub
 
 Private Sub cmbMarginModeY_AfterUpdate()
 
-    chartFormat_.marginModeY = cmbMarginModeY.Value
+    chartFormat_.marginModeY = cmbMarginModeY.value
 
 End Sub
 
@@ -374,11 +374,11 @@ Private Sub ChangeSize(ByVal deltaValue As Single)
         Select Case chartFormat_.Series.ChartType
             Case Scatter_
                 .MarkerSize = .MarkerSize + deltaValue
-                txtSize.Value = .MarkerSize
+                txtSize.value = .MarkerSize
                 lstSeries.List(selectedListIdx, enSeriesListCol.size_) = .MarkerSize
             Case Line_
                 .LineWeight = .LineWeight + deltaValue
-                txtSize.Value = .LineWeight
+                txtSize.value = .LineWeight
                 lstSeries.List(selectedListIdx, enSeriesListCol.size_) = .LineWeight
         End Select
     End With
@@ -388,8 +388,8 @@ End Sub
 Private Sub txtSeriesName_AfterUpdate()
     
     With selectedSeries
-        .Name = txtSeriesName.Value
-        lstSeries.List(selectedListIdx, enSeriesListCol.name_) = txtSeriesName.Value
+        .Name = txtSeriesName.value
+        lstSeries.List(selectedListIdx, enSeriesListCol.name_) = txtSeriesName.value
     End With
 
 End Sub
@@ -416,7 +416,7 @@ Private Sub ShowSeriesDetail()
         With selectedSeries
             ' 系列名とデータ列
             selectedSeriesIdx = .Index
-            txtSeriesName.Value = .Name
+            txtSeriesName.value = .Name
             
             ' マーカー or 線
             Select Case chartFormat_.Series.ChartType
@@ -436,13 +436,13 @@ Private Sub ShowSeriesDetail()
             End If
             
             ' サイズ
-            txtSize.Value = selectedSize
+            txtSize.value = selectedSize
             
             ' 第2軸利用
             If .useSecondAxis Then
-                chkSecondAxis.Value = True
+                chkSecondAxis.value = True
             Else
-                chkSecondAxis.Value = False
+                chkSecondAxis.value = False
             End If
         End With
     End If
