@@ -186,6 +186,15 @@ End Sub
 
 Public Sub DrawColorBar(ByRef colors() As Long)
 
+    '-------------------------------------------------
+    ' 1つの色の長さを決定する基準分割数（長さ方向のplotAreaサイズをこれで割った値を1色の長さにする）
+    ' 分割数がこれを超えるときは、バー全体の長さ限界を長さ方向のplotAreaサイズにする
+    ' 即ち、
+    '  colorsの要素数 <= BaseDevisionCount：全体の長さは1色の長さ×要素数
+    '  colorsの要素数 > BaseDevisionCount：全体の長さはplotAreaの長さに固定、1色の長さが小さくなる
+    Const BaseDevisionCount As Long = 15
+    '-------------------------------------------------
+    
     Dim leftPos As Double
     Dim topPos As Double
     Dim width As Double
@@ -194,28 +203,37 @@ Public Sub DrawColorBar(ByRef colors() As Long)
     
     Set co = targetChart.Parent
     
+    ' サイズ
     With targetChart.PlotArea
-        ' サイズ
         If ColorBar.LabelPosition = lpLeft Or ColorBar.LabelPosition = lpRight Then
             ' vertical
             width = .InsideWidth / 10
-            height = .InsideHeight
+            height = IIf(UBound(colors) + 1 <= BaseDevisionCount, _
+                         .InsideHeight / BaseDevisionCount * (UBound(colors) + 1), _
+                         .InsideHeight _
+                     )
         Else
-            ' holizontal
-            width = .InsideWidth
+            ' horizontal
+            width = IIf(UBound(colors) + 1 <= BaseDevisionCount, _
+                         .InsideWidth / BaseDevisionCount * (UBound(colors) + 1), _
+                         .InsideWidth _
+                     )
             height = .InsideHeight / 10
         End If
-        ' 位置
+    End With
+        
+    ' 位置
+    With targetChart.PlotArea
         Select Case ColorBar.LabelPosition
             Case lpLeft
                 leftPos = IIf(co.Left - width <= 0, 1, co.Left - width)
                 topPos = co.Top + .InsideTop
             Case lpRight
-                leftPos = co.Left + co.width
+                leftPos = co.Left + co.width - 50
                 topPos = co.Top + .InsideTop
             Case lpTop
                 leftPos = co.Left + .InsideLeft
-                topPos = IIf(co.Top - height <= 0, 1, co.Top - height)
+                topPos = IIf(co.Top - height + 50 <= 0, 1, co.Top - height + 50)
             Case lpBottom
                 leftPos = co.Left + .InsideLeft
                 topPos = co.Top + co.height

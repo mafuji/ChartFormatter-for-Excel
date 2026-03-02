@@ -152,7 +152,6 @@ End Sub
 
 Public Sub ApplyTo(ByRef targetChart As Chart)
 
-    ' Œ»óŒÅ’è‚Ìİ’è“K—p
     With targetChart
         
         ' ŠO˜gü“h‚è‚Â‚Ô‚µ‚È‚µ
@@ -321,7 +320,7 @@ Public Sub ApplyTo(ByRef targetChart As Chart)
     End With
     
     ' NiceScale
-    Dim atu As axisTypeUsage
+    Dim atu As AxisTypeUsage
     
     If Not (IsAutoScaleX And IsAutoScaleY) Then
         Select Case True

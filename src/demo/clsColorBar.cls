@@ -28,6 +28,8 @@ Private pGroupName As String
 Private pLabelPosition As LabelPosition
 Private pLabelMode As LabelMode
 Private pLabelOffset As Double
+Private pLabelUnit As Long ' ラベルの表示間隔：lmCustomの時のみ使用
+Private pLabelFormat As LabelFormat
 
 ' フォントクラス
 Private pLabelFont As clsFont
@@ -39,16 +41,15 @@ Private pShapeNames As Collection
 ' 初期化
 ' ==========================
 Private Sub Class_Initialize()
-    pLabelPosition = lpRight
-    pLabelMode = lmAll
+    pReverse = False
     pLabelOffset = 4
     
     Set pShapeNames = New Collection
     
     ' デフォルトフォント設定
     Set pLabelFont = New clsFont
-    pLabelFont.FontName = "Calibri"
-    pLabelFont.Size = 9
+    pLabelFont.FontName = DEFAULT_FONT_NAME
+    pLabelFont.Size = DEFAULT_FONT_SIZE
 End Sub
 
 ' ==========================
@@ -112,6 +113,22 @@ End Property
 
 Public Property Get LabelOffset() As Double
     LabelOffset = pLabelOffset
+End Property
+
+Public Property Let LabelUnit(ByVal value As Long)
+    pLabelUnit = value
+End Property
+
+Public Property Get LabelUnit() As Long
+    LabelUnit = pLabelUnit
+End Property
+
+Public Property Let LabelFormat(ByVal value As LabelFormat)
+    pLabelFormat = value
+End Property
+
+Public Property Get LabelFormat() As LabelFormat
+    LabelFormat = pLabelFormat
 End Property
 
 Public Property Get GroupName() As String
@@ -185,9 +202,16 @@ Public Sub Draw()
         pShapeNames.Add shp.Name
         
         ' ===== ラベル描画 =====
-        If pLabelMode = lmAll Or (pLabelMode = lmMinMax And (i = 0 Or i = n - 1)) Then
+        If pLabelMode = lmAll _
+        Or (pLabelMode = lmMinMax And (i = 0 Or i = n - 1)) _
+        Or (pLabelMode = lmCustom And (i = 0 Or i = n - 1 Or Int(CCur(i + 1) / CCur(pLabelUnit)) = CCur(i + 1) / CCur(pLabelUnit))) Then
             
-            labelText = CStr(i + 1)
+            Select Case pLabelFormat
+                Case lfCardinal
+                    labelText = CStr(i + 1)
+                Case lfOrdinal
+                    labelText = ToOrdinal(i + 1)
+            End Select
             
             If pLabelPosition = lpLeft Or pLabelPosition = lpRight Then
                 y = pTop + i * segSize + segSize / 2
@@ -212,6 +236,8 @@ Public Sub Draw()
             End If
             lbl.Fill.Visible = msoFalse
             lbl.TextFrame.Characters.Text = labelText
+            lbl.TextFrame2.WordWrap = msoFalse
+            lbl.TextFrame2.AutoSize = msoAutoSizeShapeToFitText
             
             ' ===== clsFont適用 =====
             If Not pLabelFont Is Nothing Then

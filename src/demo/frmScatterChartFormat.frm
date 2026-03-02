@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmScatterChartFormat 
    Caption         =   "散布図整形"
-   ClientHeight    =   5136
-   ClientLeft      =   108
-   ClientTop       =   456
-   ClientWidth     =   10464
+   ClientHeight    =   5145
+   ClientLeft      =   105
+   ClientTop       =   450
+   ClientWidth     =   10470
    OleObjectBlob   =   "frmScatterChartFormat.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
