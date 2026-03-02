@@ -20,6 +20,7 @@ Private vStartCell_ As range
 Private ahStartCell_ As range
 Private startStep_ As enChargeStatus
 Private cycleCount_ As Long
+Private colorBar_ As New clsColorBar
 
 Public Property Get targetChart() As Chart
     Set targetChart = targetChart_
@@ -82,6 +83,15 @@ Public Property Let CycleCount(ByVal newCycleCount As Long)
     cycleCount_ = newCycleCount
 End Property
 
+
+Public Property Get ColorBar() As clsColorBar
+    Set ColorBar = colorBar_
+End Property
+
+Public Property Set ColorBar(ByVal newColorBar As clsColorBar)
+    Set colorBar_ = newColorBar
+End Property
+
 Public Sub DeleteChart()
 
     Me.targetChart.Parent.Delete
@@ -91,7 +101,7 @@ End Sub
 ' グラフに系列を追加する
 Public Sub CreateChart()
 
-    Set targetChart_ = ActiveSheet.ChartObjects.Add(1, 1, 100, 100).Chart
+    Set targetChart_ = ActiveSheet.ChartObjects.Add(100, 100, 100, 100).Chart
     targetChart_.ChartType = xlXYScatter
 
     Dim ws As Worksheet
@@ -109,7 +119,7 @@ Public Sub CreateChart()
     Set rAH = Me.AHStartCell
 
     ' 開始ステップの奇偶を採用
-    currentStep = rStep.Value
+    currentStep = rStep.value
     targetParity = currentStep Mod 2
 
     ' charge/discharge の開始
@@ -125,10 +135,10 @@ Public Sub CreateChart()
         firstRow = rStep.Row
 
         ' 対象 parity のステップが来るまで下へ
-        Do While rStep.Value Mod 2 <> targetParity
-            Set rStep = rStep.Offset(1, 0)
-            Set rV = rV.Offset(1, 0)
-            Set rAH = rAH.Offset(1, 0)
+        Do While rStep.value Mod 2 <> targetParity
+            Set rStep = rStep.offset(1, 0)
+            Set rV = rV.offset(1, 0)
+            Set rAH = rAH.offset(1, 0)
             If IsEmpty(rStep) Then Exit Sub
         Loop
 
@@ -137,12 +147,12 @@ Public Sub CreateChart()
 
         ' 同じステップが続く限り下へ
         Dim thisStep As Long
-        thisStep = rStep.Value
+        thisStep = rStep.value
 
-        Do While rStep.Value = thisStep
-            Set rStep = rStep.Offset(1, 0)
-            Set rV = rV.Offset(1, 0)
-            Set rAH = rAH.Offset(1, 0)
+        Do While rStep.value = thisStep
+            Set rStep = rStep.offset(1, 0)
+            Set rV = rV.offset(1, 0)
+            Set rAH = rAH.offset(1, 0)
             If IsEmpty(rStep) Then Exit Do
         Loop
 
@@ -174,42 +184,68 @@ Public Sub CreateChart()
 
 End Sub
 
-' 数字を "1st", "2nd", "3rd", "4th" のような表記に変換
-Private Function ToOrdinal(ByVal v As Variant) As String
-    Dim n As Long
-    Dim suffix As String
-    Dim absN As Long
-    Dim lastTwo As Long
-    Dim lastOne As Long
-    Dim sign As String
+Public Sub DrawColorBar(ByRef colors() As Long)
+
+    '-------------------------------------------------
+    ' 1つの色の長さを決定する基準分割数（長さ方向のplotAreaサイズをこれで割った値を1色の長さにする）
+    ' 分割数がこれを超えるときは、バー全体の長さ限界を長さ方向のplotAreaサイズにする
+    ' 即ち、
+    '  colorsの要素数 <= BaseDevisionCount：全体の長さは1色の長さ×要素数
+    '  colorsの要素数 > BaseDevisionCount：全体の長さはplotAreaの長さに固定、1色の長さが小さくなる
+    Const BaseDevisionCount As Long = 15
+    '-------------------------------------------------
     
-    ' 数値チェック
-    If IsNull(v) Or Not IsNumeric(v) Then
-        ToOrdinal = ""
-        Exit Function
-    End If
+    Dim leftPos As Double
+    Dim topPos As Double
+    Dim width As Double
+    Dim height As Double
+    Dim co As ChartObject
     
-    ' 符号保持（-1 → "-1st" など）
-    sign = IIf(CDbl(v) < 0, "-", "")
+    Set co = targetChart.Parent
     
-    ' 小数は整数部で判定（例：21.9 → 21st）
-    n = Fix(CDbl(v))           ' Fixは0方向に丸め（-1.7→-1）
-    absN = Abs(n)
-    
-    ' 11,12,13 は常に "th"
-    lastTwo = absN Mod 100
-    lastOne = absN Mod 10
-    
-    If lastTwo >= 11 And lastTwo <= 13 Then
-        suffix = "th"
-    Else
-        Select Case lastOne
-            Case 1: suffix = "st"
-            Case 2: suffix = "nd"
-            Case 3: suffix = "rd"
-            Case Else: suffix = "th"
+    ' サイズ
+    With targetChart.PlotArea
+        If ColorBar.LabelPosition = lpLeft Or ColorBar.LabelPosition = lpRight Then
+            ' vertical
+            width = .InsideWidth / 10
+            height = IIf(UBound(colors) + 1 <= BaseDevisionCount, _
+                         .InsideHeight / BaseDevisionCount * (UBound(colors) + 1), _
+                         .InsideHeight _
+                     )
+        Else
+            ' horizontal
+            width = IIf(UBound(colors) + 1 <= BaseDevisionCount, _
+                         .InsideWidth / BaseDevisionCount * (UBound(colors) + 1), _
+                         .InsideWidth _
+                     )
+            height = .InsideHeight / 10
+        End If
+    End With
+        
+    ' 位置
+    With targetChart.PlotArea
+        Select Case ColorBar.LabelPosition
+            Case lpLeft
+                leftPos = IIf(co.Left - width <= 0, 1, co.Left - width)
+                topPos = co.Top + .InsideTop
+            Case lpRight
+                leftPos = co.Left + co.width - 50
+                topPos = co.Top + .InsideTop
+            Case lpTop
+                leftPos = co.Left + .InsideLeft
+                topPos = IIf(co.Top - height + 50 <= 0, 1, co.Top - height + 50)
+            Case lpBottom
+                leftPos = co.Left + .InsideLeft
+                topPos = co.Top + co.height
         End Select
-    End If
-    
-    ToOrdinal = sign & CStr(absN) & suffix
-End Function
+    End With
+
+    ' draw処理（他のプロパティは適宜設定）
+    ColorBar.Initialize colors, ActiveSheet, leftPos, topPos, width, height
+    ColorBar.Draw
+
+    ' グラフとグループ化
+'    Dim grp As Shape
+'    Set grp = ActiveSheet.Shapes.range(Array(ColorBar.GroupName, co.ShapeRange(1).Name)).Group
+
+End Sub

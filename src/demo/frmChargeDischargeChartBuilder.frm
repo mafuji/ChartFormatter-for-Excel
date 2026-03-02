@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmChargeDischargeChartBuilder 
    Caption         =   "充放電グラフ作成"
-   ClientHeight    =   4872
+   ClientHeight    =   6210
    ClientLeft      =   120
-   ClientTop       =   468
-   ClientWidth     =   10008
+   ClientTop       =   465
+   ClientWidth     =   10455
    OleObjectBlob   =   "frmChargeDischargeChartBuilder.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -28,6 +28,102 @@ Private Const DEFAULT_AH_COLUMN As String = "I"
 Private Const DEFAULT_V_COLUMN As String = "F"
 Private Const DEFAULT_DATA_START_ROW As Long = 8
 
+
+
+' カラーバーラベル表示間隔
+Private Sub optColorBarUnitMaxMin_AfterUpdate()
+
+    chargeDischargeChart.ColorBar.LabelMode = lmMinMax
+    SetColorBarUnitEnabled
+
+End Sub
+
+Private Sub optColorBarUnitAll_AfterUpdate()
+
+    chargeDischargeChart.ColorBar.LabelMode = lmAll
+    SetColorBarUnitEnabled
+
+End Sub
+
+Private Sub optColorBarUnitCustom_AfterUpdate()
+
+    chargeDischargeChart.ColorBar.LabelMode = lmCustom
+    SetColorBarUnitEnabled
+
+End Sub
+
+Private Sub SetColorBarUnitEnabled()
+
+    If optColorBarUnitCustom = True Then
+        txtColorBarUnit.Enabled = True
+    Else
+        txtColorBarUnit.Enabled = False
+    End If
+
+End Sub
+
+Private Sub txtColorBarUnit_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+
+    If Not IsValidNumericKeyPress(KeyAscii, txtColorBarUnit, False) Then
+        KeyAscii = 0
+    End If
+
+End Sub
+
+Private Sub txtColorBarUnit_AfterUpdate()
+
+    If (Not IsNumeric(txtColorBarUnit)) _
+    Or Int(val(txtColorBarUnit)) <> val(txtColorBarUnit) _
+    Or val(txtColorBarUnit) <= 0 Then
+        txtColorBarUnit = ""
+        chargeDischargeChart.ColorBar.LabelUnit = 1
+    Else
+        chargeDischargeChart.ColorBar.LabelUnit = txtColorBarUnit.value
+    End If
+
+End Sub
+
+
+' カラーバーラベル形式
+Private Sub optCardinal_AfterUpdate()
+
+    chargeDischargeChart.ColorBar.LabelFormat = lfCardinal
+
+End Sub
+
+Private Sub optOrdinal_AfterUpdate()
+
+    chargeDischargeChart.ColorBar.LabelFormat = lfOrdinal
+
+End Sub
+
+' カラーバー位置
+Private Sub optColorBarTop_AfterUpdate()
+
+    chargeDischargeChart.ColorBar.LabelPosition = lpTop
+
+End Sub
+
+Private Sub optColorBarBottom_AfterUpdate()
+
+    chargeDischargeChart.ColorBar.LabelPosition = lpBottom
+
+End Sub
+
+Private Sub optColorBarLeft_AfterUpdate()
+
+    chargeDischargeChart.ColorBar.LabelPosition = lpLeft
+
+End Sub
+
+Private Sub optColorBarRight_AfterUpdate()
+
+    chargeDischargeChart.ColorBar.LabelPosition = lpRight
+
+End Sub
+
+
+
 Private Sub UserForm_Initialize()
 
     ' データ範囲の既定設定
@@ -49,6 +145,15 @@ Private Sub UserForm_Initialize()
     txtVal = 0.85
     lblStartHue.ForeColor = colorPalette.MakeHueGradientColors(1, txtStartHue)(0)
     lblEndHue.ForeColor = colorPalette.MakeHueGradientColors(1, txtEndHue)(0)
+    
+    ' カラーバーの既定設定
+    With chargeDischargeChart.ColorBar
+        optColorBarRight = True: .LabelPosition = lpRight
+        optCardinal = True: .LabelFormat = lfCardinal
+        optColorBarUnitCustom = True: .LabelMode = lmCustom
+        SetColorBarUnitEnabled
+        txtColorBarUnit = 10: .LabelUnit = 10
+    End With
     
 End Sub
 
@@ -174,8 +279,8 @@ Private Sub btnSetStartCells_Click()
     Dim rng As range
     
     Set rng = range(txtStepColumn & txtDataStartRow)
-    Do Until val(rng) = val(cmbStartStep.Value) Or rng = ""
-        Set rng = rng.Offset(1)
+    Do Until val(rng) = val(cmbStartStep.value) Or rng = ""
+        Set rng = rng.offset(1)
     Loop
     If rng = "" Then
         MsgBox "開始ステップが見つかりませんでした。", vbExclamation
@@ -343,12 +448,11 @@ End Sub
 
 Private Sub txtCycle_AfterUpdate()
 
-    chargeDischargeChart.CycleCount = txtCycle.Value
+    chargeDischargeChart.CycleCount = txtCycle.value
     
 End Sub
 
 ' 色関係
-
 Private Sub txtStartHue_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
 
     If Not IsValidNumericKeyPress(KeyAscii, txtStartHue, False) Then
@@ -517,12 +621,12 @@ Private Sub btnExecute_Click()
     
     With chartFormat_.Series
         gradColors = colorPalette.MakeHueGradientColors( _
-            IIf(txtN = "", .Count / 2, txtN.Value), _
-            startHue:=IIf(txtStartHue = "", 300, txtStartHue.Value), _
-            endHue:=IIf(txtEndHue = "", 0, txtEndHue.Value), _
-            sat:=IIf(txtSat = "", 1, txtSat.Value), _
-            val:=IIf(txtVal = "", 0.85, txtVal.Value), _
-            shortestPath:=chkShortest.Value _
+            IIf(txtN = "", .Count / 2, txtN.value), _
+            startHue:=IIf(txtStartHue = "", 300, txtStartHue.value), _
+            endHue:=IIf(txtEndHue = "", 0, txtEndHue.value), _
+            sat:=IIf(txtSat = "", 1, txtSat.value), _
+            val:=IIf(txtVal = "", 0.85, txtVal.value), _
+            shortestPath:=chkShortest.value _
         )
         For i = 1 To .Count
             .Item(i).LineColor = gradColors(Int((i + 1) / 2) - 1)
@@ -539,6 +643,9 @@ Private Sub btnExecute_Click()
     
     ' フォーマット適用
     chartFormat_.ApplyTo chargeDischargeChart.targetChart
+    
+    ' カラーバー作成
+    chargeDischargeChart.DrawColorBar gradColors
     
     ' 完了
     ActiveWindow.ScrollColumn = 1

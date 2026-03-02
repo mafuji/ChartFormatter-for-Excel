@@ -5,6 +5,7 @@ Option Explicit
 ' グラフ系ユーティリティ
 '---------------------------------------------------------------
 
+' グラフの端の値セット
 Public Type ChartExtents
     HasData As Boolean
     MinX As Double
@@ -13,12 +14,14 @@ Public Type ChartExtents
     MaxY As Double
 End Type
 
+' 軸の設定セット
 Public Type AxisScale
     Min As Double
     Max As Double
     MajorUnit As Double
 End Type
 
+' グラフの端の設定
 Public Enum AxisMarginMode
     ammFitBoth = 0          ' min,max とも一致OK
     ammExpandMax = 1        ' maxのみ +1目盛
@@ -26,16 +29,39 @@ Public Enum AxisMarginMode
     ammExpandBoth = 3       ' 両方 1目盛拡張
 End Enum
 
+' Y軸利用のタイプ（Chart全体として）
 Public Enum AxisGroupUsage
-    aguBoth = 0
-    aguOnly1stY
-    aguOnly2ndY
+    aguBoth = 0 ' 1Y,2Y両方使う
+    aguOnly1stY = 1 ' 1Yのみ使う
+    aguOnly2ndY = 2 ' 2Yのみ使う（基本ない）
 End Enum
 
-Public Enum axisTypeUsage
-    atuBoth = 0
-    atuOnlyX
-    atuOnlyY
+' NiceScaleの利用タイプ（Chart全体として）
+Public Enum AxisTypeUsage
+    atuBoth = 0 ' 両方適用
+    atuOnlyX = 1 ' X軸のみ適用
+    atuOnlyY = 2 ' Y軸のみ適用
+End Enum
+
+' カラーバーラベル位置
+Public Enum LabelPosition
+    lpRight = 0
+    lpLeft = 1
+    lpTop = 2
+    lpBottom = 3
+End Enum
+
+' カラーバーラベル表示間隔
+Public Enum LabelMode
+    lmAll = 0
+    lmMinMax = 1
+    lmCustom = 2
+End Enum
+
+' カラーバーラベル表示形式
+Public Enum LabelFormat
+    lfCardinal = 0 ' 1,2,...
+    lfOrdinal = 1 ' 1st,2nd,...
 End Enum
 
 Public Function GetChartExtents(ByVal ch As Chart, ByVal targetAxis As AxisGroupUsage) As ChartExtents
@@ -145,7 +171,7 @@ Private Function SeriesValuesToArray(ByVal v As Variant) As Variant
         ReDim resultArr(1 To CLng(v.Cells.CountLarge)) As Variant
         For Each c In v.Cells
             cnt = cnt + 1
-            resultArr(cnt) = c.Value
+            resultArr(cnt) = c.value
         Next
         SeriesValuesToArray = resultArr
         Exit Function
@@ -255,7 +281,7 @@ Function GetColumnLetter(rng As range) As String
     Dim m As Object
     If re.test(rng.Address(False, False)) Then
         Set m = re.Execute(rng.Address(False, False))(0)
-        GetColumnLetter = m.Value
+        GetColumnLetter = m.value
     End If
 End Function
 
@@ -345,7 +371,7 @@ End Function
 
 ' ちょうどいいスケールを設定する
 Public Sub NiceScaling(ByRef targetChart As Chart, _
-                       ByVal atu As axisTypeUsage, _
+                       ByVal atu As AxisTypeUsage, _
                        Optional ByVal useSecondaryYAxis As Boolean = True, _
                        Optional ByVal marginModeX As AxisMarginMode = ammFitBoth, _
                        Optional ByVal marginModeY As AxisMarginMode = ammFitBoth)

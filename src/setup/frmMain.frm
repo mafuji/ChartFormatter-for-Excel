@@ -3,8 +3,8 @@ Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmMain
    Caption         =   "ChartFromatterSetup"
    ClientHeight    =   3765
    ClientLeft      =   120
-   ClientTop       =   468
-   ClientWidth     =   7308
+   ClientTop       =   465
+   ClientWidth     =   7305
    OleObjectBlob   =   "frmMain.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End

@@ -24,20 +24,20 @@ Private isAutoScaleY_ As Boolean
 Private marginModeX_ As AxisMarginMode
 Private marginModeY_ As AxisMarginMode
 
-Public Property Let Height(ByVal newHeight As Double)
+Public Property Let height(ByVal newHeight As Double)
     height_ = newHeight
 End Property
 
-Public Property Get Height() As Double
-    Height = height_
+Public Property Get height() As Double
+    height = height_
 End Property
 
-Public Property Let Width(ByVal newWidth As Double)
+Public Property Let width(ByVal newWidth As Double)
     width_ = newWidth
 End Property
 
-Public Property Get Width() As Double
-    Width = width_
+Public Property Get width() As Double
+    width = width_
 End Property
 
 Public Property Let HasLegend(ByVal newHasLegend As Boolean)
@@ -152,7 +152,6 @@ End Sub
 
 Public Sub ApplyTo(ByRef targetChart As Chart)
 
-    ' 現状固定の設定適用
     With targetChart
         
         ' 外枠線塗りつぶしなし
@@ -167,7 +166,7 @@ Public Sub ApplyTo(ByRef targetChart As Chart)
         ' 凡例
         .HasLegend = Me.HasLegend
         If .HasLegend Then
-            .Legend.Position = xlLegendPositionTop
+            .Legend.position = xlLegendPositionTop
         End If
     
         ' 系列の設定適用
@@ -262,12 +261,12 @@ Public Sub ApplyTo(ByRef targetChart As Chart)
     Dim plotAreaSize As Double
     
     plotAreaSize = axisLabelSpace * 4
-    Me.PlotArea.Height = plotAreaSize
-    Me.PlotArea.Width = plotAreaSize
+    Me.PlotArea.height = plotAreaSize
+    Me.PlotArea.width = plotAreaSize
     
     ' 軸ラベル＋プロットエリア＝全体サイズ 適用
-    targetChart.ChartArea.Height = axisLabelSpace * 2 + plotAreaSize
-    targetChart.ChartArea.Width = axisLabelSpace * 2 + plotAreaSize
+    targetChart.ChartArea.height = axisLabelSpace * 2 + plotAreaSize
+    targetChart.ChartArea.width = axisLabelSpace * 2 + plotAreaSize
     
     ' プロットエリア適用
     Me.PlotArea.ApplyTo targetChart
@@ -321,7 +320,7 @@ Public Sub ApplyTo(ByRef targetChart As Chart)
     End With
     
     ' NiceScale
-    Dim atu As axisTypeUsage
+    Dim atu As AxisTypeUsage
     
     If Not (IsAutoScaleX And IsAutoScaleY) Then
         Select Case True
