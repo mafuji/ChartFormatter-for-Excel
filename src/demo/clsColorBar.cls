@@ -221,7 +221,11 @@ Public Sub Draw()
                     x = pLeft + pWidth + pLabelOffset
                 End If
                 Set lbl = pParent.Shapes.AddTextbox(msoTextOrientationHorizontal, x, y - 8, 30, 16)
-                lbl.TextFrame.HorizontalAlignment = xlHAlignRight
+                If pLabelPosition = lpLeft Then
+                    lbl.TextFrame.HorizontalAlignment = xlHAlignRight
+                Else
+                    lbl.TextFrame.HorizontalAlignment = xlHAlignLeft
+                End If
                 lbl.TextFrame.VerticalAlignment = xlVAlignCenter
             Else
                 x = pLeft + i * segSize + segSize / 2
@@ -236,8 +240,6 @@ Public Sub Draw()
             End If
             lbl.Fill.Visible = msoFalse
             lbl.TextFrame.Characters.Text = labelText
-            lbl.TextFrame2.WordWrap = msoFalse
-            lbl.TextFrame2.AutoSize = msoAutoSizeShapeToFitText
             
             ' ===== clsFont適用 =====
             If Not pLabelFont Is Nothing Then
@@ -245,6 +247,11 @@ Public Sub Draw()
                 lbl.TextFrame.Characters.Font.Size = pLabelFont.Size
             End If
             
+            lbl.TextFrame2.WordWrap = msoFalse
+            lbl.TextFrame2.AutoSize = msoAutoSizeShapeToFitText
+            
+            ' ラベルのフォントカラーを虹色に
+'            lbl.TextFrame.Characters.Font.Color = pColors(i)
             lbl.Line.Visible = msoFalse
             pShapeNames.Add lbl.Name
             

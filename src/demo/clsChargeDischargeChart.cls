@@ -207,7 +207,7 @@ Public Sub DrawColorBar(ByRef colors() As Long)
     With targetChart.PlotArea
         If ColorBar.LabelPosition = lpLeft Or ColorBar.LabelPosition = lpRight Then
             ' vertical
-            width = .InsideWidth / 10
+            width = .InsideWidth / 30
             height = IIf(UBound(colors) + 1 <= BaseDevisionCount, _
                          .InsideHeight / BaseDevisionCount * (UBound(colors) + 1), _
                          .InsideHeight _
@@ -218,7 +218,7 @@ Public Sub DrawColorBar(ByRef colors() As Long)
                          .InsideWidth / BaseDevisionCount * (UBound(colors) + 1), _
                          .InsideWidth _
                      )
-            height = .InsideHeight / 10
+            height = .InsideHeight / 30
         End If
     End With
         
