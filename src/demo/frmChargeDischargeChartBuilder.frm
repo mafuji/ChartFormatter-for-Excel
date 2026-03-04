@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmChargeDischargeChartBuilder 
    Caption         =   "充放電グラフ作成"
-   ClientHeight    =   8940
+   ClientHeight    =   9600.001
    ClientLeft      =   120
-   ClientTop       =   465
-   ClientWidth     =   10005
+   ClientTop       =   468
+   ClientWidth     =   9984.001
    OleObjectBlob   =   "frmChargeDischargeChartBuilder.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -45,10 +45,13 @@ Private Sub UserForm_Initialize()
     txtVColumn = DEFAULT_V_COLUMN
     txtDataStartRow = DEFAULT_DATA_START_ROW
     cmbStartStep.List = Array(1, 2, 3, 4)
-    cmbStartStep.ListIndex = 1
+    cmbStartStep.ListIndex = 0
 
     ' 開始ステップのChargeTypeを設定
     chargeDischargeChart.StartStep = IIf(optCharge, Charge, Discharge)
+    
+    ' 線幅既定値
+    txtLineWeight = 1
     
     ' 色の既定設定
     txtStartHue = 0
@@ -109,6 +112,7 @@ Private Sub txtStepColumn_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
 
 End Sub
 
+' 対象データ範囲
 Private Sub txtStepColumn_AfterUpdate()
 
     Dim rng As range
@@ -225,6 +229,7 @@ Private Sub btnSetStartCells_Click()
 
 End Sub
 
+' 開始セル
 Private Sub txtCycleStart_AfterUpdate()
 
     ValidateRangeText txtCycleStart
@@ -492,6 +497,83 @@ Private Sub ToggleCycleAlert()
     End With
 
 End Sub
+
+' 系列の線幅
+Private Sub txtLineWeight_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+
+    If Not IsValidNumericKeyPress(KeyAscii, txtLineWeight, True) Then
+        KeyAscii = 0
+    End If
+
+End Sub
+
+Private Sub txtLineWeight_AfterUpdate()
+
+    If (Not IsNumeric(txtLineWeight)) _
+    Or val(txtLineWeight) <= 0 Then
+        txtLineWeight = 1
+    Else
+        txtLineWeight = Int((txtLineWeight.value + 0.005) * 100) / 100
+    End If
+    
+End Sub
+
+Private Sub spnLineWeight_SpinUp()
+    
+    If txtLineWeight = "" Then
+        txtLineWeight = 1
+    Else
+        txtLineWeight = GetQuaterUnit(txtLineWeight.value, True)
+    End If
+
+End Sub
+
+Private Sub spnLineWeight_SpinDown()
+    
+    If txtLineWeight <= 0 Then
+        txtLineWeight = 0
+    ElseIf txtLineWeight = "" Then
+        txtLineWeight = 1
+    Else
+        txtLineWeight = GetQuaterUnit(txtLineWeight.value, False)
+    End If
+
+End Sub
+
+Private Function GetQuaterUnit(ByVal value As Single, ByVal getUpper As Boolean) As Double
+
+    Dim dec As Single
+    Dim ret As Single
+    
+    dec = value - Int(value)
+    If getUpper Then
+        Select Case True
+            Case dec < 0.25
+                ret = Int(value) + 0.25
+            Case dec < 0.5
+                ret = Int(value) + 0.5
+            Case dec < 0.75
+                ret = Int(value) + 0.75
+            Case Else
+                ret = Int(value) + 1
+        End Select
+    Else
+        Select Case True
+            Case dec = 0
+                ret = Int(value) - 0.25
+            Case dec <= 0.25
+                ret = Int(value)
+            Case dec <= 0.5
+                ret = Int(value) + 0.25
+            Case dec <= 0.75
+                ret = Int(value) + 0.5
+            Case Else
+                ret = Int(value) + 0.75
+        End Select
+    End If
+    GetQuaterUnit = ret
+
+End Function
 
 ' 色関係
 Private Sub txtStartHue_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
@@ -866,6 +948,7 @@ Private Sub btnExecute_Click()
     With chartFormat_
         .Series.ChartType = Line_
         .Series.IsSmooth = True
+        .Series.LineWeight = IIf(txtLineWeight = "", 1, txtLineWeight)
     End With
 
     ' グラデーション作成～各系列にセット
@@ -893,9 +976,14 @@ Private Sub btnExecute_Click()
         .marginModeY = ammFitBoth
     End With
     
+     ' 軸の設定
     With chargeDischargeChart.targetChart
         .Axes(xlCategory, xlPrimary).TickLabels.NumberFormatLocal = NUMBER_FORMAT_ZERO_OR_DECIMAL
+        .Axes(xlCategory, xlPrimary).HasTitle = True
+        .Axes(xlCategory, xlPrimary).AxisTitle.Text = "Capacity"
         .Axes(xlValue, xlPrimary).TickLabels.NumberFormatLocal = NUMBER_FORMAT_ZERO_OR_DECIMAL
+        .Axes(xlValue, xlPrimary).HasTitle = True
+        .Axes(xlValue, xlPrimary).AxisTitle.Text = "Cell voltage"
     End With
     
     ' フォーマット適用

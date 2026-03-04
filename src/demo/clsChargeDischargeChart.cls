@@ -300,7 +300,11 @@ Public Sub CreateChart()
         dataBuffer_(i, 0) = i ' CYCLE
         dataBuffer_(i, 1) = dicDataBuffer(i)(1) ' AH(charge)
         dataBuffer_(i, 2) = dicDataBuffer(i)(2) ' AH(discharge)
-        dataBuffer_(i, 3) = dicDataBuffer(i)(1) / dicDataBuffer(i)(2) * 100 ' AH(charge)/AH(discharge)[%]
+        If dicDataBuffer(i)(2) = 0 Then
+            dataBuffer_(i, 3) = ""
+        Else
+            dataBuffer_(i, 3) = dicDataBuffer(i)(1) / dicDataBuffer(i)(2) * 100 ' AH(charge)/AH(discharge)[%]
+        End If
     Next
     
     ' ç≈èIÉTÉCÉNÉãÅ®1stÇÃèáÇ…ånóÒÇçÏê¨
@@ -429,14 +433,14 @@ Private Sub OutputDataSheet()
     ' CYCLE vs. AH(discharge) ånóÒí«â¡
     Dim s As Series
     Set s = newChart.SeriesCollection.newSeries
-    s.Name = "discahrge"
+    s.Name = "Discharge capacity"
     s.XValues = outputRange.Columns(1).Offset(1).Resize(outputRange.Rows.Count - 1, 1)
     s.values = outputRange.Columns(3).Offset(1).Resize(outputRange.Rows.Count - 1, 1)
     s.AxisGroup = xlPrimary
     
     ' CYCLE vs. charge/discharge ånóÒí«â¡
     Set s = newChart.SeriesCollection.newSeries
-    s.Name = "charge/discahrge"
+    s.Name = "Coulombic efficiency"
     s.XValues = outputRange.Columns(1).Offset(1).Resize(outputRange.Rows.Count - 1, 1)
     s.values = outputRange.Columns(4).Offset(1).Resize(outputRange.Rows.Count - 1, 1)
     s.AxisGroup = xlSecondary
@@ -449,9 +453,12 @@ Private Sub OutputDataSheet()
     
     With newChart
         .Axes(xlCategory, xlPrimary).TickLabels.NumberFormatLocal = "#,##0"
+        .Axes(xlCategory, xlPrimary).AxisTitle.Text = "Cycle [-]"
         .Axes(xlValue, xlPrimary).TickLabels.NumberFormatLocal = NUMBER_FORMAT_ZERO_OR_DECIMAL
+        .Axes(xlValue, xlPrimary).AxisTitle.Text = "Discharge capacity"
         .Axes(xlValue, xlSecondary).TickLabels.NumberFormatLocal = "#,##0"
-        .Axes(xlValue, xlSecondary).MaximumScale = 105
+        .Axes(xlValue, xlSecondary).AxisTitle.Text = "Coulombic efficiency [%]"
+        .Axes(xlValue, xlSecondary).MaximumScale = 100
         .Axes(xlValue, xlSecondary).MinimumScale = 0
         .Axes(xlValue, xlSecondary).MajorUnit = 10
     End With

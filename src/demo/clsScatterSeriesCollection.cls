@@ -16,6 +16,7 @@ Option Explicit
 Private items_ As Object
 Private chartType_ As enChartType
 Private isSmooth_ As Boolean
+Private lineWeight_ As Single
 
 Private Sub Class_Initialize()
     Set items_ = CreateObject("Scripting.Dictionary")
@@ -50,6 +51,22 @@ Public Property Let IsSmooth(ByVal newIsSmooth As Boolean)
         Item(i).IsSmooth = Me.IsSmooth
     Next
 End Property
+
+' --- lineweight ---
+Public Property Get LineWeight() As Single
+    LineWeight = lineWeight_
+End Property
+
+Public Property Let LineWeight(ByVal newLineWeight As Single)
+    lineWeight_ = newLineWeight
+    
+    Dim i As Integer
+    
+    For i = 1 To Me.Count
+        Item(i).LineWeight = Me.LineWeight
+    Next
+End Property
+
 
 Public Sub Add(ByVal s As clsScatterSeries)
     items_.Add s.index, s

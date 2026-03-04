@@ -145,7 +145,6 @@ Public Sub LoadFromSeries(ByVal SeriesIndex As Integer, ByVal targetSeries As Se
     ' ê¸
     Me.LineColor = targetSeries.Format.Line.ForeColor.RGB
     If targetSeries.Format.Line.Visible = msoTrue Then
-        
         Me.LineWeight = targetSeries.Format.Line.Weight
     Else
         Me.LineWeight = DEFAULT_LINE_WEIGHT
