@@ -193,7 +193,7 @@ Private Sub btnSetStartCells_Click()
     Or txtAHColumn = "" _
     Or txtDataStartRow = "" _
     Or IIf(IsNull(cmbStartStep), "", cmbStartStep) = "" Then
-        MsgBox "各列番号,データ開始行を全て入力してください。", vbExclamation
+        MsgBox "列番号/データ開始行/開始ステップを全て入力してください。", vbExclamation
         Exit Sub
     End If
 
@@ -205,7 +205,9 @@ Private Sub btnSetStartCells_Click()
         Set rng = rng.Offset(1)
     Loop
     If rng = "" Then
-        MsgBox "開始ステップが見つかりませんでした。", vbExclamation
+        MsgBox "開始ステップが見つかりませんでした。" & _
+               "列番号/データ開始行/開始ステップが、" & _
+               "表示中のシートのレイアウトに合致するか確認してください。", vbExclamation
         Exit Sub
     End If
 
@@ -844,6 +846,10 @@ Private Sub btnExecute_Click()
 
     ' Chart作成実行
     Application.Cursor = xlWait
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    
+    On Error GoTo Error_Handler
     
     chargeDischargeChart.CreateChart
     If chargeDischargeChart.targetChart.SeriesCollection.Count <= 0 Then
@@ -901,14 +907,26 @@ Private Sub btnExecute_Click()
     ' 完了
     ActiveWindow.ScrollColumn = 1
     ActiveWindow.ScrollRow = 1
-    Unload Me
     
     Application.Cursor = xlDefault
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    
+    On Error GoTo 0
     
     MsgBox "完了しました。", vbInformation
+    Unload Me
+    Exit Sub
 
 Exit_Proc:
     Application.Cursor = xlDefault
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    Exit Sub
+
+Error_Handler:
+    MsgBox "エラー" & Err.Number & ":" & Err.Description
+    GoTo Exit_Proc
 
 End Sub
 
@@ -917,4 +935,3 @@ Private Sub btnCancel_Click()
     Unload Me
 
 End Sub
-

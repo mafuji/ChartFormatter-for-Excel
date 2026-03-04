@@ -14,7 +14,7 @@ Option Explicit
 '===============================================================
 
 '---------------------------------------------------------------
-' V vs. AH グラフ
+' AH vs. V グラフ
 '---------------------------------------------------------------
 Private targetChart_ As Chart
 
@@ -293,7 +293,7 @@ Public Sub CreateChart()
     dataBuffer_(0, 0) = "CYCLE"
     dataBuffer_(0, 1) = "AH(charge)"
     dataBuffer_(0, 2) = "AH(discharge)"
-    dataBuffer_(0, 3) = "AH(charge)/AH(discharge)[%])"
+    dataBuffer_(0, 3) = "AH(charge)/AH(discharge)[%]"
     
     ' データ
     For i = 1 To maxCycle_
