@@ -13,9 +13,13 @@ Public Const DUMMY_SERIES_NAME As String = "__DUMMY_SERIES_NAME_106841651__"
 
 ' 各種既定値
 Public Const DEFAULT_FONT_NAME As String = "Arial Narrow"
+Public Const DEFAULT_FONT_NAME_FAR_EAST As String = "MS UI Gothic"
 Public Const DEFAULT_FONT_SIZE As Single = 16
 Public Const DEFAULT_MARKER_SIZE As Integer = 6
 Public Const DEFAULT_LINE_WEIGHT As Single = 1.5
+
+' カスタム表示形式
+Public Const NUMBER_FORMAT_ZERO_OR_DECIMAL As String = "[=0]0;0.0"
 
 ' グラフタイプ
 Public Enum enChartType
@@ -131,4 +135,39 @@ Public Function ToOrdinal(ByVal v As Variant) As String
     End If
     
     ToOrdinal = sign & CStr(absN) & suffix
+End Function
+
+' シート名被り回避
+Public Function UniqueSheetName(ByRef targetBook As Workbook, ByVal orgSheetName As String) As String
+
+    Dim isUnique As Boolean
+    Dim duplicateNo As Integer
+    Dim tmpName As String
+
+    isUnique = False
+    duplicateNo = 0
+    Do Until isUnique = True
+        tmpName = orgSheetName & IIf(duplicateNo = 0, "", "_" & duplicateNo)
+        isUnique = (Not IsSheetExists(targetBook, tmpName))
+        duplicateNo = duplicateNo + 1
+    Loop
+    UniqueSheetName = tmpName
+
+End Function
+
+' シート名存在確認
+Public Function IsSheetExists(ByRef targetBook As Workbook, ByVal orgSheetName As String) As Boolean
+
+    Dim ws As Worksheet
+    Dim isExists As Boolean
+    
+    isExists = False
+    For Each ws In targetBook.Worksheets
+        If ws.Name = orgSheetName Then
+            isExists = True
+            Exit For
+        End If
+    Next
+    IsSheetExists = isExists
+
 End Function

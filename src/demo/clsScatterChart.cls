@@ -24,20 +24,20 @@ Private isAutoScaleY_ As Boolean
 Private marginModeX_ As AxisMarginMode
 Private marginModeY_ As AxisMarginMode
 
-Public Property Let height(ByVal newHeight As Double)
+Public Property Let Height(ByVal newHeight As Double)
     height_ = newHeight
 End Property
 
-Public Property Get height() As Double
-    height = height_
+Public Property Get Height() As Double
+    Height = height_
 End Property
 
-Public Property Let width(ByVal newWidth As Double)
+Public Property Let Width(ByVal newWidth As Double)
     width_ = newWidth
 End Property
 
-Public Property Get width() As Double
-    width = width_
+Public Property Get Width() As Double
+    Width = width_
 End Property
 
 Public Property Let HasLegend(ByVal newHasLegend As Boolean)
@@ -261,12 +261,12 @@ Public Sub ApplyTo(ByRef targetChart As Chart)
     Dim plotAreaSize As Double
     
     plotAreaSize = axisLabelSpace * 4
-    Me.PlotArea.height = plotAreaSize
-    Me.PlotArea.width = plotAreaSize
+    Me.PlotArea.Height = plotAreaSize
+    Me.PlotArea.Width = plotAreaSize
     
     ' 軸ラベル＋プロットエリア＝全体サイズ 適用
-    targetChart.ChartArea.height = axisLabelSpace * 2 + plotAreaSize
-    targetChart.ChartArea.width = axisLabelSpace * 2 + plotAreaSize
+    targetChart.ChartArea.Height = axisLabelSpace * 2 + plotAreaSize
+    targetChart.ChartArea.Width = axisLabelSpace * 2 + plotAreaSize
     
     ' プロットエリア適用
     Me.PlotArea.ApplyTo targetChart

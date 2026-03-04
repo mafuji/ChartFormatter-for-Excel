@@ -18,20 +18,20 @@ Private width_ As Double
 Private top_ As Double
 Private left_ As Double
 
-Public Property Let height(ByVal newHeight As Double)
+Public Property Let Height(ByVal newHeight As Double)
     height_ = newHeight
 End Property
 
-Public Property Get height() As Double
-    height = height_
+Public Property Get Height() As Double
+    Height = height_
 End Property
 
-Public Property Let width(ByVal newWidth As Double)
+Public Property Let Width(ByVal newWidth As Double)
     width_ = newWidth
 End Property
 
-Public Property Get width() As Double
-    width = width_
+Public Property Get Width() As Double
+    Width = width_
 End Property
 
 Public Property Let Left(ByVal newLeft As Double)
@@ -54,8 +54,8 @@ Public Function Clone() As clsPlotArea
     
     Dim c As New clsPlotArea
     
-    c.width = Me.width
-    c.height = Me.height
+    c.Width = Me.Width
+    c.Height = Me.Height
     c.Top = Me.Top
     c.Left = Me.Left
     
@@ -87,8 +87,8 @@ Public Sub ApplyTo(ByRef targetChart As Chart)
         ' プロパティ
         .InsideTop = Me.Top
         .InsideLeft = Me.Left
-        .InsideHeight = Me.height
-        .InsideWidth = Me.width
+        .InsideHeight = Me.Height
+        .InsideWidth = Me.Width
     End With
 
 End Sub

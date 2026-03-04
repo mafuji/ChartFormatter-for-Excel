@@ -18,7 +18,7 @@ Private pParent As Worksheet
 Private pLeft As Double
 Private pTop As Double
 Private pWidth As Double
-Private pHeight As Double
+Private pLength As Double
 
 Private pReverse As Boolean
 
@@ -30,6 +30,7 @@ Private pLabelMode As LabelMode
 Private pLabelOffset As Double
 Private pLabelUnit As Long ' ラベルの表示間隔：lmCustomの時のみ使用
 Private pLabelFormat As LabelFormat
+Private pIsColorfulLabel As Boolean
 
 ' フォントクラス
 Private pLabelFont As clsFont
@@ -59,22 +60,34 @@ Public Sub Initialize( _
         ByRef colors() As Long, _
         ByVal parentSheet As Worksheet, _
         ByVal leftPos As Double, _
-        ByVal topPos As Double, _
-        ByVal width As Double, _
-        ByVal height As Double)
+        ByVal topPos As Double)
 
     pColors = colors
     Set pParent = parentSheet
     
     pLeft = leftPos
     pTop = topPos
-    pWidth = width
-    pHeight = height
 End Sub
 
 ' ==========================
 ' プロパティ
 ' ==========================
+Public Property Let Width(ByVal value As Double)
+    pWidth = value
+End Property
+
+Public Property Get Width() As Double
+    Width = pWidth
+End Property
+
+Public Property Let Length(ByVal value As Double)
+    pLength = value
+End Property
+
+Public Property Get Length() As Double
+    Length = pLength
+End Property
+
 Public Property Let Reverse(ByVal value As Boolean)
     pReverse = value
 End Property
@@ -131,6 +144,14 @@ Public Property Get LabelFormat() As LabelFormat
     LabelFormat = pLabelFormat
 End Property
 
+Public Property Let IsColorfulLabel(ByVal value As Boolean)
+    pIsColorfulLabel = value
+End Property
+
+Public Property Get IsColorfulLabel() As Boolean
+    IsColorfulLabel = pIsColorfulLabel
+End Property
+
 Public Property Get GroupName() As String
     GroupName = pGroupName
 End Property
@@ -163,11 +184,7 @@ Public Sub Draw()
     n = UBound(pColors) - baseIndex + 1
     If n <= 0 Then Exit Sub
     
-    If pLabelPosition = lpLeft Or pLabelPosition = lpRight Then
-        segSize = pHeight / n
-    Else
-        segSize = pWidth / n
-    End If
+    segSize = pLength / n
     
     For i = 0 To n - 1
         
@@ -194,7 +211,7 @@ Public Sub Draw()
                         pLeft + idx * segSize, _
                         pTop, _
                         segSize + 0.5, _
-                        pHeight)
+                        pWidth)
         End If
         
         shp.Fill.ForeColor.RGB = pColors(colorIndex)
@@ -232,7 +249,7 @@ Public Sub Draw()
                 If pLabelPosition = lpTop Then
                     y = pTop - 16 - pLabelOffset
                 Else
-                    y = pTop + pHeight + pLabelOffset
+                    y = pTop + pWidth + pLabelOffset
                 End If
                 Set lbl = pParent.Shapes.AddTextbox(msoTextOrientationHorizontal, x - 15, y, 30, 16)
                 lbl.TextFrame.HorizontalAlignment = xlHAlignCenter
@@ -251,10 +268,13 @@ Public Sub Draw()
             lbl.TextFrame2.AutoSize = msoAutoSizeShapeToFitText
             
             ' ラベルのフォントカラーを虹色に
-'            lbl.TextFrame.Characters.Font.Color = pColors(i)
+            If IsColorfulLabel Then
+                lbl.TextFrame.Characters.Font.Color = pColors(i)
+            Else
+                lbl.TextFrame.Characters.Font.Color = vbBlack
+            End If
             lbl.Line.Visible = msoFalse
             pShapeNames.Add lbl.Name
-            
         End If
         
     Next i

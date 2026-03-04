@@ -52,7 +52,7 @@ Public Property Let IsSmooth(ByVal newIsSmooth As Boolean)
 End Property
 
 Public Sub Add(ByVal s As clsScatterSeries)
-    items_.Add s.Index, s
+    items_.Add s.index, s
 End Sub
 
 Public Sub Remove(ByVal seriesIdx As Long)

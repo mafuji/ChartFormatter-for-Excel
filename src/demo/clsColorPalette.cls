@@ -31,10 +31,10 @@ Private Sub Class_Initialize()
         )
 End Sub
 
-Public Function GetColor(ByVal Index As Long) As Long
+Public Function GetColor(ByVal index As Long) As Long
     Dim n As Long
     n = UBound(colors) - LBound(colors) + 1
-    GetColor = colors((Index - 1) Mod n)
+    GetColor = colors((index - 1) Mod n)
 End Function
 
 Public Function GetColorName(ByVal rgbValue As Long) As String
@@ -79,9 +79,9 @@ Public Function Count() As Long
     Count = UBound(colors) - LBound(colors) + 1
 End Function
 
-Public Sub SetColor(ByVal Index As Long, ByVal colorValue As Long)
-    If Index >= 1 And Index <= Count Then
-        colors(Index - 1) = colorValue
+Public Sub SetColor(ByVal index As Long, ByVal colorValue As Long)
+    If index >= 1 And index <= Count Then
+        colors(index - 1) = colorValue
     End If
 End Sub
 
