@@ -293,17 +293,17 @@ Public Sub CreateChart()
     dataBuffer_(0, 0) = "CYCLE"
     dataBuffer_(0, 1) = "AH(charge)"
     dataBuffer_(0, 2) = "AH(discharge)"
-    dataBuffer_(0, 3) = "AH(charge)/AH(discharge)[%]"
+    dataBuffer_(0, 3) = "AH(discharge)/AH(charge)[%]"
     
     ' ÉfÅ[É^
     For i = 1 To maxCycle_
         dataBuffer_(i, 0) = i ' CYCLE
         dataBuffer_(i, 1) = dicDataBuffer(i)(1) ' AH(charge)
         dataBuffer_(i, 2) = dicDataBuffer(i)(2) ' AH(discharge)
-        If dicDataBuffer(i)(2) = 0 Then
+        If dicDataBuffer(i)(1) = 0 Then
             dataBuffer_(i, 3) = ""
         Else
-            dataBuffer_(i, 3) = dicDataBuffer(i)(1) / dicDataBuffer(i)(2) * 100 ' AH(charge)/AH(discharge)[%]
+            dataBuffer_(i, 3) = dicDataBuffer(i)(2) / dicDataBuffer(i)(1) * 100 ' AH(discharge)/AH(charge)[%]
         End If
     Next
     

@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmChargeDischargeChartBuilder 
    Caption         =   "充放電グラフ作成"
-   ClientHeight    =   9600.001
+   ClientHeight    =   9600
    ClientLeft      =   120
-   ClientTop       =   468
-   ClientWidth     =   9984.001
+   ClientTop       =   465
+   ClientWidth     =   9990
    OleObjectBlob   =   "frmChargeDischargeChartBuilder.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -944,13 +944,6 @@ Private Sub btnExecute_Click()
     Set chartFormat_ = New clsScatterChart
     chartFormat_.SetDefault chargeDischargeChart.targetChart
 
-    ' 書式設定
-    With chartFormat_
-        .Series.ChartType = Line_
-        .Series.IsSmooth = True
-        .Series.LineWeight = IIf(txtLineWeight = "", 1, txtLineWeight)
-    End With
-
     ' グラデーション作成～各系列にセット
     Dim gradColors() As Long
     
@@ -968,12 +961,19 @@ Private Sub btnExecute_Click()
         Next
     End With
 
-    ' 固有設定
+    ' NiceScale設定
     With chartFormat_
         .IsAutoScaleX = False
         .IsAutoScaleY = False
         .marginModeX = ammFitBoth
         .marginModeY = ammFitBoth
+    End With
+    
+    ' 系列書式設定
+    With chartFormat_.Series
+        .ChartType = Line_
+        .IsSmooth = True
+        .LineWeight = IIf(txtLineWeight = "", 1, txtLineWeight)
     End With
     
      ' 軸の設定
