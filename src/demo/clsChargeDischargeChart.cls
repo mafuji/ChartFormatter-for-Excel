@@ -205,7 +205,7 @@ Public Sub CreateChart()
 
     ' 開始ステップの奇偶を採用
     currentStep = rStep.value
-    targetParity = currentStep Mod 2
+    targetParity = currentStep Mod 2 ' 0:偶,1:奇
 
     ' charge/discharge の開始
     isCharge = (Me.StartStep = Charge)

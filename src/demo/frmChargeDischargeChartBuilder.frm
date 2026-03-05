@@ -921,7 +921,9 @@ Private Sub btnExecute_Click()
     
     ' 行数違い確認
     If Not isSameRow Then
-        If MsgBox("全ての開始セルが同じ行ではありませんが、よろしいですか？", vbExclamation + vbYesNo) = vbNo Then
+        If MsgBox("全ての開始セルが同じ行ではありませんが、よろしいですか？" & vbCrLf & _
+                  "※系列のデータ範囲は、STEPの開始セルの行数を基準に決定します。", _
+                  vbExclamation + vbYesNo) = vbNo Then
             Exit Sub
         End If
     End If
