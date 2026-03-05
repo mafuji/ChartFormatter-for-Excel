@@ -181,7 +181,7 @@ Public Sub DeleteChart()
 End Sub
 
 ' グラフに系列を追加する
-Public Sub CreateChart()
+Public Sub CreateChart(ByVal outputAdditionalSheet As Boolean)
 
     Set targetChart_ = ActiveSheet.ChartObjects.Add(100, 100, 100, 100).Chart
     targetChart_.ChartType = xlXYScatter
@@ -224,8 +224,9 @@ Public Sub CreateChart()
             Set rStep = rStep.Offset(1, 0)
             Set rV = rV.Offset(1, 0)
             Set rAH = rAH.Offset(1, 0)
-            If IsEmpty(rStep) Then Exit Sub
+            If IsEmpty(rStep) Then Exit Do
         Loop
+        If IsEmpty(rStep) Then Exit Do
 
         ' ブロック開始
         firstRow = rStep.Row
@@ -260,8 +261,8 @@ Public Sub CreateChart()
             With chargeDischargeSeries_(seriesCount)
                 .CycleIndex = CycleIndex
                 .SeriesName = SeriesName
-                .SeriesXValue = ws.range(ws.Cells(firstRow, Me.AHStartCell.Column), ws.Cells(lastRow, Me.AHStartCell.Column))
-                .SeriesValue = ws.range(ws.Cells(firstRow, Me.VStartCell.Column), ws.Cells(lastRow, Me.VStartCell.Column))
+                Set .SeriesXValue = ws.range(ws.Cells(firstRow, Me.AHStartCell.Column), ws.Cells(lastRow, Me.AHStartCell.Column))
+                Set .SeriesValue = ws.range(ws.Cells(firstRow, Me.VStartCell.Column), ws.Cells(lastRow, Me.VStartCell.Column))
             End With
             
             seriesCount = seriesCount + 1
@@ -283,7 +284,7 @@ Public Sub CreateChart()
             CycleIndex = CycleIndex + 1
         End If
     Loop
-    maxCycle_ = CycleIndex - 1
+    maxCycle_ = CycleIndex - IIf(isCharge = (StartStep = Charge), 1, 0)
     
     ' 各ステップ最終行データプールを出力用に配列に格納
     Dim i As Integer
@@ -293,17 +294,29 @@ Public Sub CreateChart()
     dataBuffer_(0, 0) = "CYCLE"
     dataBuffer_(0, 1) = "AH(charge)"
     dataBuffer_(0, 2) = "AH(discharge)"
-    dataBuffer_(0, 3) = "AH(discharge)/AH(charge)[%]"
+    If startStep_ = Charge Then
+        dataBuffer_(0, 3) = "AH(discharge)/AH(charge)[%]"
+    Else
+        dataBuffer_(0, 3) = "AH(charge)/AH(discharge)[%]"
+    End If
     
     ' データ
     For i = 1 To maxCycle_
         dataBuffer_(i, 0) = i ' CYCLE
         dataBuffer_(i, 1) = dicDataBuffer(i)(1) ' AH(charge)
         dataBuffer_(i, 2) = dicDataBuffer(i)(2) ' AH(discharge)
-        If dicDataBuffer(i)(1) = 0 Then
-            dataBuffer_(i, 3) = ""
+        If startStep_ = Charge Then
+            If dicDataBuffer(i)(1) = 0 Then
+                dataBuffer_(i, 3) = ""
+            Else
+                dataBuffer_(i, 3) = dicDataBuffer(i)(2) / dicDataBuffer(i)(1) * 100 ' AH(discharge)/AH(charge)[%]
+            End If
         Else
-            dataBuffer_(i, 3) = dicDataBuffer(i)(2) / dicDataBuffer(i)(1) * 100 ' AH(discharge)/AH(charge)[%]
+            If dicDataBuffer(i)(2) = 0 Then
+                dataBuffer_(i, 3) = ""
+            Else
+                dataBuffer_(i, 3) = dicDataBuffer(i)(1) / dicDataBuffer(i)(2) * 100 ' AH(charge)/AH(discharge)[%]
+            End If
         End If
     Next
     
@@ -318,7 +331,7 @@ Public Sub CreateChart()
     Next
 
     ' 出力シート作成
-    OutputDataSheet
+    If outputAdditionalSheet Then OutputDataSheet
 
 End Sub
 
@@ -392,8 +405,8 @@ Public Sub DrawColorBar(ByRef colors() As Long)
     ColorBar.Draw
 
     ' グラフとグループ化
-'    Dim grp As Shape
-'    Set grp = ActiveSheet.Shapes.range(Array(ColorBar.GroupName, co.ShapeRange(1).Name)).Group
+    Dim grp As Shape
+    Set grp = ActiveSheet.Shapes.range(Array(ColorBar.GroupName, co.ShapeRange(1).Name)).Group
 
 End Sub
 

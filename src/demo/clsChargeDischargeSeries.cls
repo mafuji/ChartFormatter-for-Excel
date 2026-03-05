@@ -18,8 +18,8 @@ Option Explicit
 
 Private cycleIndex_ As Long
 Private seriesName_ As String
-Private seriesXVlue_ As Variant
-Private seriesVlue_ As Variant
+Private seriesXVlue_ As range
+Private seriesVlue_ As range
 
 Public Property Get CycleIndex() As Long
     CycleIndex = cycleIndex_
@@ -39,19 +39,19 @@ Public Property Let SeriesName(ByVal newSeriesName As String)
 End Property
 
 
-Public Property Get SeriesXValue() As Variant
-    SeriesXValue = seriesXVlue_
+Public Property Get SeriesXValue() As range
+    Set SeriesXValue = seriesXVlue_
 End Property
 
-Public Property Let SeriesXValue(ByVal newSeriesXValue As Variant)
-    seriesXVlue_ = newSeriesXValue
+Public Property Set SeriesXValue(ByVal newSeriesXValue As range)
+    Set seriesXVlue_ = newSeriesXValue
 End Property
 
 
-Public Property Get SeriesValue() As Variant
-    SeriesValue = seriesVlue_
+Public Property Get SeriesValue() As range
+    Set SeriesValue = seriesVlue_
 End Property
 
-Public Property Let SeriesValue(ByVal newSeriesValue As Variant)
-    seriesVlue_ = newSeriesValue
+Public Property Set SeriesValue(ByVal newSeriesValue As range)
+    Set seriesVlue_ = newSeriesValue
 End Property

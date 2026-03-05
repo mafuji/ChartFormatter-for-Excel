@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmChargeDischargeChartBuilder 
    Caption         =   "充放電グラフ作成"
-   ClientHeight    =   9600
+   ClientHeight    =   9600.001
    ClientLeft      =   120
-   ClientTop       =   465
-   ClientWidth     =   9990
+   ClientTop       =   468
+   ClientWidth     =   9984.001
    OleObjectBlob   =   "frmChargeDischargeChartBuilder.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -935,7 +935,7 @@ Private Sub btnExecute_Click()
     
     On Error GoTo Error_Handler
     
-    chargeDischargeChart.CreateChart
+    chargeDischargeChart.CreateChart chkAdditionalOutput.value
     If chargeDischargeChart.targetChart.SeriesCollection.Count <= 0 Then
         chargeDischargeChart.DeleteChart
         MsgBox "データが正しくセットされませんでした。グラフ作成が失敗しました。", vbExclamation
