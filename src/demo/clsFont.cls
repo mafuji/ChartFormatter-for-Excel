@@ -14,7 +14,14 @@ Option Explicit
 '---------------------------------------------------------------
 
 Private fontName_ As String
+Private FontNameFarEast_ As String
 Private size_ As Single
+
+Public Sub Class_Initialize()
+    
+    FontNameFarEast_ = DEFAULT_FONT_NAME_FAR_EAST
+    
+End Sub
 
 Public Property Get FontName() As String
     FontName = fontName_
@@ -47,7 +54,7 @@ Public Sub ApplyTo(ByRef targetChart As Chart)
     
     With targetChart.ChartArea.Format.TextFrame2.TextRange.Font
         .NameComplexScript = Me.FontName
-        .NameFarEast = Me.FontName
+        .NameFarEast = FontNameFarEast_
         .Name = Me.FontName
         .Size = Me.Size
         .Fill.ForeColor.RGB = RGB(0, 0, 0)

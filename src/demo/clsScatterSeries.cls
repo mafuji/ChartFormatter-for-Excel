@@ -25,11 +25,11 @@ Private chartType_ As enChartType
 Private isSmooth_ As Boolean
 
 ' --- index ---
-Public Property Get Index() As Long
-    Index = index_
+Public Property Get index() As Long
+    index = index_
 End Property
 
-Public Property Let Index(ByVal newIndex As Long)
+Public Property Let index(ByVal newIndex As Long)
     index_ = newIndex
 End Property
 
@@ -129,9 +129,9 @@ Public Function Clone() As clsScatterSeries
 End Function
 
 ' Seriesから設定をコピー
-Public Sub LoadFromSeries(ByVal seriesIndex As Integer, ByVal targetSeries As Series)
+Public Sub LoadFromSeries(ByVal SeriesIndex As Integer, ByVal targetSeries As Series)
 
-    Me.Index = seriesIndex
+    Me.index = SeriesIndex
     Me.Name = targetSeries.Name
     
     ' マーカー
@@ -145,7 +145,6 @@ Public Sub LoadFromSeries(ByVal seriesIndex As Integer, ByVal targetSeries As Se
     ' 線
     Me.LineColor = targetSeries.Format.Line.ForeColor.RGB
     If targetSeries.Format.Line.Visible = msoTrue Then
-        
         Me.LineWeight = targetSeries.Format.Line.Weight
     Else
         Me.LineWeight = DEFAULT_LINE_WEIGHT

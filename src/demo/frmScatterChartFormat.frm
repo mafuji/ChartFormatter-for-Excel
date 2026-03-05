@@ -2,9 +2,9 @@ VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmScatterChartFormat 
    Caption         =   "散布図整形"
    ClientHeight    =   5145
-   ClientLeft      =   105
-   ClientTop       =   450
-   ClientWidth     =   10470
+   ClientLeft      =   108
+   ClientTop       =   456
+   ClientWidth     =   10464
    OleObjectBlob   =   "frmScatterChartFormat.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -71,11 +71,11 @@ Private Sub UserForm_Activate()
     ' 系列リスト初期設定
     lstSeries.ColumnWidths = _
         "0;" & _
-        lblListHeaderName.width & ";" & _
-        lblListHeaderDataColumn.width & ";" & _
-        lblListHeaderColor.width & ";" & _
-        lblListHeaderSize.width & ";" & _
-        lblListHeaderSecond.width
+        lblListHeaderName.Width & ";" & _
+        lblListHeaderDataColumn.Width & ";" & _
+        lblListHeaderColor.Width & ";" & _
+        lblListHeaderSize.Width & ";" & _
+        lblListHeaderSecond.Width
     ToggleType ' グラフ種類に応じた設定
     
     ' Scale
@@ -243,7 +243,7 @@ Private Sub ToggleType()
                     sizeValue = .Item(i).LineWeight
             End Select
             AddRow lstSeries, Array( _
-                .Item(i).Index, _
+                .Item(i).index, _
                 .Item(i).Name, _
                 .Item(i).DataColumn, _
                 colorPalette.GetColorName(colorValue), _
@@ -415,7 +415,7 @@ Private Sub ShowSeriesDetail()
         Set selectedSeries = chartFormat_.Series.Item(lstSeries.List(selectedListIdx))
         With selectedSeries
             ' 系列名とデータ列
-            selectedSeriesIdx = .Index
+            selectedSeriesIdx = .index
             txtSeriesName.value = .Name
             
             ' マーカー or 線

@@ -13,9 +13,13 @@ Public Const DUMMY_SERIES_NAME As String = "__DUMMY_SERIES_NAME_106841651__"
 
 ' 各種既定値
 Public Const DEFAULT_FONT_NAME As String = "Arial Narrow"
+Public Const DEFAULT_FONT_NAME_FAR_EAST As String = "MS UI Gothic"
 Public Const DEFAULT_FONT_SIZE As Single = 16
 Public Const DEFAULT_MARKER_SIZE As Integer = 6
-Public Const DEFAULT_LINE_WEIGHT As Single = 1.5
+Public Const DEFAULT_LINE_WEIGHT As Single = 1
+
+' カスタム表示形式
+Public Const NUMBER_FORMAT_ZERO_OR_DECIMAL As String = "[=0]0;0.0"
 
 ' グラフタイプ
 Public Enum enChartType
@@ -132,3 +136,120 @@ Public Function ToOrdinal(ByVal v As Variant) As String
     
     ToOrdinal = sign & CStr(absN) & suffix
 End Function
+
+' シート名被り回避
+Public Function UniqueSheetName(ByRef targetBook As Workbook, ByVal orgSheetName As String) As String
+
+    Dim isUnique As Boolean
+    Dim duplicateNo As Integer
+    Dim tmpName As String
+
+    isUnique = False
+    duplicateNo = 0
+    Do Until isUnique = True
+        tmpName = orgSheetName & IIf(duplicateNo = 0, "", "_" & duplicateNo)
+        isUnique = (Not IsSheetExists(targetBook, tmpName))
+        duplicateNo = duplicateNo + 1
+    Loop
+    UniqueSheetName = tmpName
+
+End Function
+
+' シート名存在確認
+Public Function IsSheetExists(ByRef targetBook As Workbook, ByVal orgSheetName As String) As Boolean
+
+    Dim ws As Worksheet
+    Dim isExists As Boolean
+    
+    isExists = False
+    For Each ws In targetBook.Worksheets
+        If ws.Name = orgSheetName Then
+            isExists = True
+            Exit For
+        End If
+    Next
+    IsSheetExists = isExists
+
+End Function
+
+Function GetUniqueFilePath(targetPath As String, orgFileName As String) As String
+    Dim baseName As String
+    Dim ext As String
+    Dim fullPath As String
+    Dim i As Long
+    Dim pos As Long
+
+    ' 拡張子とベース名を分離
+    pos = InStrRev(orgFileName, ".")
+    If pos > 0 Then
+        baseName = Left(orgFileName, pos - 1)
+        ext = Mid(orgFileName, pos)
+    Else
+        baseName = orgFileName
+        ext = ""
+    End If
+
+    ' 最初のフルパス
+    fullPath = targetPath & "\" & orgFileName
+
+    ' 存在チェックして連番付与
+    i = 1
+    While Dir(fullPath) <> ""
+        fullPath = targetPath & "\" & baseName & "(" & i & ")" & ext
+        i = i + 1
+    Wend
+
+    GetUniqueFilePath = fullPath
+End Function
+
+'-----------------------------------------------------------
+' 開発用
+
+' シートを全部クリアしてからxlamとしてカレントに保存
+Private Sub BuildXlam()
+    
+    ' ターゲットxlam存在確認
+    Const ADDIN_FILE_NAME As String = "ChartFormatter.xlam"
+    Const TMP_FILE_NAME As String = "tmp_ChartFormatter.xlsm"
+    
+    Dim addinFilePath As String
+    Dim tmpFilePath As String
+    
+    addinFilePath = GetUniqueFilePath(ThisWorkbook.Path, ADDIN_FILE_NAME)
+    tmpFilePath = GetUniqueFilePath(ThisWorkbook.Path, TMP_FILE_NAME)
+    
+    ' 一時コピー作成
+    Dim tmpWb As Workbook
+    
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
+    Application.EnableEvents = False
+    
+    ThisWorkbook.SaveCopyAs tmpFilePath
+    Set tmpWb = Workbooks.Open(tmpFilePath)
+    
+    ' 一時コピーのシートクリア
+    Dim tmpWs As Worksheet
+    Dim ws As Worksheet
+    
+    Set tmpWs = tmpWb.Worksheets.Add
+    For Each ws In tmpWb.Worksheets
+        If ws.Name <> tmpWs.Name Then
+            ws.Delete
+        End If
+    Next
+    
+    ' xlam保存
+    tmpWb.SaveAs addinFilePath, FileFormat:=xlOpenXMLAddIn
+    tmpWb.Close SaveChanges:=False
+    
+    ' 一時ファイル削除
+    Kill tmpFilePath
+    
+    Application.EnableEvents = True
+    Application.DisplayAlerts = True
+    Application.ScreenUpdating = True
+    
+    MsgBox "xlamビルド完了", vbInformation
+    
+End Sub

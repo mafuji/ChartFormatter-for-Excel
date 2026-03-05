@@ -315,11 +315,11 @@ Function GetChart(ByVal targetObject As Object) As Object
 End Function
 
 ' Œn—ñ–¼‚©‚ç‘Î‰‚·‚é–}—á‚ğíœ‚·‚é
-Public Sub DeleteLegendEntryBySeriesName(ByVal ch As Chart, ByVal seriesName As String)
+Public Sub DeleteLegendEntryBySeriesName(ByVal ch As Chart, ByVal SeriesName As String)
     Dim i As Long
     If ch Is Nothing Or Not ch.HasLegend Then Exit Sub
     For i = ch.SeriesCollection.Count To 1 Step -1
-        If StrComp(ch.SeriesCollection(i).Name, seriesName, vbTextCompare) = 0 Then
+        If StrComp(ch.SeriesCollection(i).Name, SeriesName, vbTextCompare) = 0 Then
             If i <= ch.Legend.LegendEntries.Count Then
                 ch.Legend.LegendEntries(i).Delete
             End If
