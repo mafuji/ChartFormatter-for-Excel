@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmChargeDischargeChartBuilder 
    Caption         =   "充放電グラフ作成"
-   ClientHeight    =   9600.001
+   ClientHeight    =   7776
    ClientLeft      =   120
    ClientTop       =   468
-   ClientWidth     =   9984.001
+   ClientWidth     =   14652
    OleObjectBlob   =   "frmChargeDischargeChartBuilder.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -49,6 +49,21 @@ Private Sub UserForm_Initialize()
 
     ' 開始ステップのChargeTypeを設定
     chargeDischargeChart.StartStep = IIf(optCharge, Charge, Discharge)
+    
+    ' レイアウト
+    ' フォント
+    Dim sizes As Variant
+    Dim i As Integer
+    
+    sizes = Array(6, 7, 8, 9, 10, 10.5, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 48, 72)
+    For i = LBound(sizes) To UBound(sizes)
+        Me.cmbFontSize.AddItem sizes(i)
+    Next i
+    cmbFontSize.value = DEFAULT_FONT_SIZE
+
+    ' plotArea
+    txtPlotAreaWidth = DEFAULT_PLOTAREA_WIDTH
+    txtPlotAreaHeight = DEFAULT_PLOTAREA_HEIGHT
     
     ' 線幅既定値
     txtLineWeight = 1
@@ -498,6 +513,41 @@ Private Sub ToggleCycleAlert()
 
 End Sub
 
+' プロットエリア
+Private Sub txtPlotAreaWidth_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+
+    If Not IsValidNumericKeyPress(KeyAscii, txtPlotAreaWidth, True) Then
+        KeyAscii = 0
+    End If
+
+End Sub
+
+Private Sub txtPlotAreaWidth_AfterUpdate()
+
+    If (Not IsNumeric(txtPlotAreaWidth)) _
+    Or val(txtPlotAreaWidth) <= 0 Then
+        txtPlotAreaWidth = ""
+    End If
+    
+End Sub
+
+Private Sub txtPlotAreaHeight_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+
+    If Not IsValidNumericKeyPress(KeyAscii, txtPlotAreaHeight, True) Then
+        KeyAscii = 0
+    End If
+
+End Sub
+
+Private Sub txtPlotAreaHeight_AfterUpdate()
+
+    If (Not IsNumeric(txtPlotAreaHeight)) _
+    Or val(txtPlotAreaHeight) <= 0 Then
+        txtPlotAreaHeight = ""
+    End If
+    
+End Sub
+
 ' 系列の線幅
 Private Sub txtLineWeight_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
 
@@ -584,38 +634,6 @@ Private Sub txtStartHue_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
 
 End Sub
 
-Private Sub txtEndHue_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-
-    If Not IsValidNumericKeyPress(KeyAscii, txtEndHue, False) Then
-        KeyAscii = 0
-    End If
-
-End Sub
-
-Private Sub txtN_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-
-    If Not IsValidNumericKeyPress(KeyAscii, txtN, False) Then
-        KeyAscii = 0
-    End If
-
-End Sub
-
-Private Sub txtSat_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-
-    If Not IsValidNumericKeyPress(KeyAscii, txtSat, True) Then
-        KeyAscii = 0
-    End If
-
-End Sub
-
-Private Sub txtVal_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-
-    If Not IsValidNumericKeyPress(KeyAscii, txtVal, True) Then
-        KeyAscii = 0
-    End If
-
-End Sub
-
 Private Sub txtStartHue_AfterUpdate()
 
     If (Not IsNumeric(txtStartHue)) _
@@ -624,6 +642,14 @@ Private Sub txtStartHue_AfterUpdate()
         txtStartHue = ""
     Else
         lblStartHue.ForeColor = colorPalette.MakeHueGradientColors(1, txtStartHue)(0)
+    End If
+
+End Sub
+
+Private Sub txtEndHue_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+
+    If Not IsValidNumericKeyPress(KeyAscii, txtEndHue, False) Then
+        KeyAscii = 0
     End If
 
 End Sub
@@ -640,12 +666,28 @@ Private Sub txtEndHue_AfterUpdate()
 
 End Sub
 
+Private Sub txtN_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+
+    If Not IsValidNumericKeyPress(KeyAscii, txtN, False) Then
+        KeyAscii = 0
+    End If
+
+End Sub
+
 Private Sub txtN_AfterUpdate()
 
     If (Not IsNumeric(txtN)) _
     Or Int(val(txtN)) <> val(txtN) _
     Or val(txtN) <= 0 Then
         txtN = ""
+    End If
+
+End Sub
+
+Private Sub txtSat_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+
+    If Not IsValidNumericKeyPress(KeyAscii, txtSat, True) Then
+        KeyAscii = 0
     End If
 
 End Sub
@@ -658,6 +700,14 @@ Private Sub txtSat_AfterUpdate()
         txtSat = ""
     End If
     
+End Sub
+
+Private Sub txtVal_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+
+    If Not IsValidNumericKeyPress(KeyAscii, txtVal, True) Then
+        KeyAscii = 0
+    End If
+
 End Sub
 
 Private Sub txtVal_AfterUpdate()
@@ -963,6 +1013,11 @@ Private Sub btnExecute_Click()
         Next
     End With
 
+    ' レイアウト
+    chartFormat_.Font.Size = cmbFontSize.value
+    chartFormat_.PlotArea.Width = IIf(txtPlotAreaWidth = "", DEFAULT_PLOTAREA_WIDTH, txtPlotAreaWidth.value)
+    chartFormat_.PlotArea.Height = IIf(txtPlotAreaHeight = "", DEFAULT_PLOTAREA_HEIGHT, txtPlotAreaHeight.value)
+
     ' NiceScale設定
     With chartFormat_
         .IsAutoScaleX = False
@@ -988,11 +1043,33 @@ Private Sub btnExecute_Click()
         .Axes(xlValue, xlPrimary).AxisTitle.Text = "Cell voltage"
     End With
     
-    ' フォーマット適用
+    ' グラフ①フォーマット適用
     chartFormat_.ApplyTo chargeDischargeChart.targetChart
     
     ' カラーバー作成
+    Set chargeDischargeChart.ColorBar.LabelFont = chartFormat_.Font.Clone
     chargeDischargeChart.DrawColorBar gradColors
+    
+    ' グラフ②整形
+    Dim ceChartFormat As New clsScatterChart
+    
+    ceChartFormat.SetDefault chargeDischargeChart.CeChart
+    Set ceChartFormat.Font = chartFormat_.Font.Clone
+    Set ceChartFormat.PlotArea = chartFormat_.PlotArea.Clone
+    ceChartFormat.HasLegend = True
+    ceChartFormat.ApplyTo chargeDischargeChart.CeChart
+    
+    With chargeDischargeChart.CeChart
+        .Axes(xlCategory, xlPrimary).TickLabels.NumberFormatLocal = "#,##0"
+        .Axes(xlCategory, xlPrimary).AxisTitle.Text = "Cycle [-]"
+        .Axes(xlValue, xlPrimary).TickLabels.NumberFormatLocal = NUMBER_FORMAT_ZERO_OR_DECIMAL
+        .Axes(xlValue, xlPrimary).AxisTitle.Text = "Discharge capacity"
+        .Axes(xlValue, xlSecondary).TickLabels.NumberFormatLocal = "#,##0"
+        .Axes(xlValue, xlSecondary).AxisTitle.Text = "Coulombic efficiency [%]"
+        .Axes(xlValue, xlSecondary).MaximumScale = 100
+        .Axes(xlValue, xlSecondary).MinimumScale = 0
+        .Axes(xlValue, xlSecondary).MajorUnit = 10
+    End With
     
     ' 完了
     ActiveWindow.ScrollColumn = 1

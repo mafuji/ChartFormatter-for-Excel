@@ -113,11 +113,11 @@ End Property
 ' 既定値の設定
 Public Sub SetDefault(ByVal targetChart As Chart)
 
-    ' フォント
-    With Me.Font
-        .FontName = DEFAULT_FONT_NAME
-        .Size = DEFAULT_FONT_SIZE
-    End With
+'    ' フォント
+'    With Me.Font
+'        .FontName = DEFAULT_FONT_NAME
+'        .Size = DEFAULT_FONT_SIZE
+'    End With
     
     ' 系列の色/サイズ/種類
     Dim i As Integer
@@ -258,15 +258,16 @@ Public Sub ApplyTo(ByRef targetChart As Chart)
     Me.PlotArea.Left = axisLabelSpace
     
     ' 軸ラベルスペース→プロットエリアサイズ
-    Dim plotAreaSize As Double
-    
-    plotAreaSize = axisLabelSpace * 4
-    Me.PlotArea.Height = plotAreaSize
-    Me.PlotArea.Width = plotAreaSize
+'    Dim plotAreaSize As Double
+'
+''    plotAreaSize = axisLabelSpace * 4
+'    plotAreaSize = 217
+'    Me.PlotArea.Height = plotAreaSize
+'    Me.PlotArea.Width = plotAreaSize
     
     ' 軸ラベル＋プロットエリア＝全体サイズ 適用
-    targetChart.ChartArea.Height = axisLabelSpace * 2 + plotAreaSize
-    targetChart.ChartArea.Width = axisLabelSpace * 2 + plotAreaSize
+    targetChart.ChartArea.Height = axisLabelSpace * 2 + Me.PlotArea.Height
+    targetChart.ChartArea.Width = axisLabelSpace * 2 + Me.PlotArea.Width
     
     ' プロットエリア適用
     Me.PlotArea.ApplyTo targetChart

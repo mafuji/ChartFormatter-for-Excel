@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmScatterChartFormat 
    Caption         =   "散布図整形"
-   ClientHeight    =   5145
+   ClientHeight    =   5076
    ClientLeft      =   108
    ClientTop       =   456
-   ClientWidth     =   10464
+   ClientWidth     =   10392
    OleObjectBlob   =   "frmScatterChartFormat.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -55,7 +55,7 @@ Private Sub UserForm_Activate()
     If cmbFont.ListCount < 1 Then
         cmbFont.AddItem DEFAULT_FONT_NAME
     End If
-    cmbFont.value = chartFormat_.Font.FontName
+    cmbFont.value = DEFAULT_FONT_NAME: chartFormat_.Font.FontName = DEFAULT_FONT_NAME
 
     ' フォントサイズ一覧
     Dim sizes As Variant
@@ -63,7 +63,11 @@ Private Sub UserForm_Activate()
     For i = LBound(sizes) To UBound(sizes)
         Me.cmbFontSize.AddItem sizes(i)
     Next i
-    cmbFontSize.value = chartFormat_.Font.Size
+    cmbFontSize.value = DEFAULT_FONT_SIZE: chartFormat_.Font.Size = DEFAULT_FONT_SIZE
+
+    ' plotArea
+    txtPlotAreaWidth = DEFAULT_PLOTAREA_WIDTH: chartFormat_.PlotArea.Width = DEFAULT_PLOTAREA_WIDTH
+    txtPlotAreaHeight = DEFAULT_PLOTAREA_HEIGHT: chartFormat_.PlotArea.Height = DEFAULT_PLOTAREA_HEIGHT
 
     ' 凡例
     optHasLegend = chartFormat_.HasLegend
@@ -287,6 +291,47 @@ Private Sub cmbFontSize_AfterUpdate()
 
     chartFormat_.Font.Size = cmbFontSize.value
 
+End Sub
+
+' プロットエリア
+Private Sub txtPlotAreaWidth_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+
+    If Not IsValidNumericKeyPress(KeyAscii, txtPlotAreaWidth, True) Then
+        KeyAscii = 0
+    End If
+
+End Sub
+
+Private Sub txtPlotAreaWidth_AfterUpdate()
+
+    If (Not IsNumeric(txtPlotAreaWidth)) _
+    Or val(txtPlotAreaWidth) <= 0 Then
+        txtPlotAreaWidth = ""
+        chartFormat_.PlotArea.Width = DEFAULT_PLOTAREA_WIDTH
+    Else
+        chartFormat_.PlotArea.Width = txtPlotAreaWidth.value
+    End If
+    
+End Sub
+
+Private Sub txtPlotAreaHeight_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+
+    If Not IsValidNumericKeyPress(KeyAscii, txtPlotAreaHeight, True) Then
+        KeyAscii = 0
+    End If
+
+End Sub
+
+Private Sub txtPlotAreaHeight_AfterUpdate()
+
+    If (Not IsNumeric(txtPlotAreaHeight)) _
+    Or val(txtPlotAreaHeight) <= 0 Then
+        txtPlotAreaHeight = ""
+        chartFormat_.PlotArea.Height = DEFAULT_PLOTAREA_HEIGHT
+    Else
+        chartFormat_.PlotArea.Height = txtPlotAreaHeight.value
+    End If
+    
 End Sub
 
 ' 凡例
