@@ -46,6 +46,7 @@ Private chargeDischargeSeries_() As New clsChargeDischargeSeries ' Œn—ñî•ñ‚Ìƒoƒ
 '   2:discharge[AH]
 '   3:(charge[AH]/discharge[AH])*100
 Private dataBuffer_() As Variant
+Private ceChart_ As Chart
 
 Public Property Get targetChart() As Chart
     Set targetChart = targetChart_
@@ -172,6 +173,15 @@ End Property
 
 Public Property Get DataBuffer() As Variant
     DataBuffer = dataBuffer_
+End Property
+
+
+Public Property Get CeChart() As Chart
+    Set CeChart = ceChart_
+End Property
+
+Public Property Set CeChart(ByVal newCeChart As Chart)
+    Set ceChart_ = newCeChart
 End Property
 
 Public Sub DeleteChart()
@@ -389,11 +399,11 @@ Public Sub DrawColorBar(ByRef colors() As Long)
                 leftPos = IIf(co.Left - ColorBar.Width <= 0, 1, co.Left - ColorBar.Width)
                 topPos = co.Top + .InsideTop
             Case lpRight
-                leftPos = co.Left + co.Width - 50
+                leftPos = co.Left + co.Width - .Width / 5
                 topPos = co.Top + .InsideTop
             Case lpTop
                 leftPos = co.Left + .InsideLeft
-                topPos = IIf(co.Top - ColorBar.Width + 50 <= 0, 1, co.Top - ColorBar.Width + 50)
+                topPos = IIf(co.Top - ColorBar.Width + .Height / 5 <= 0, 1, co.Top - ColorBar.Width + 50)
             Case lpBottom
                 leftPos = co.Left + .InsideLeft
                 topPos = co.Top + co.Height
@@ -439,42 +449,23 @@ Private Sub OutputDataSheet()
     End With
     
     ' ƒOƒ‰ƒtì¬
-    Dim newChart As Chart
-    Set newChart = ws.ChartObjects.Add(100, 100, 100, 100).Chart
-    newChart.ChartType = xlXYScatter
+    Set ceChart_ = ws.ChartObjects.Add(100, 100, 100, 100).Chart
+    ceChart_.ChartType = xlXYScatter
     
     ' CYCLE vs. AH(discharge) Œn—ñ’Ç‰Á
     Dim s As Series
-    Set s = newChart.SeriesCollection.newSeries
+    Set s = ceChart_.SeriesCollection.newSeries
     s.Name = "Discharge capacity"
     s.XValues = outputRange.Columns(1).Offset(1).Resize(outputRange.Rows.Count - 1, 1)
     s.values = outputRange.Columns(3).Offset(1).Resize(outputRange.Rows.Count - 1, 1)
     s.AxisGroup = xlPrimary
     
     ' CYCLE vs. charge/discharge Œn—ñ’Ç‰Á
-    Set s = newChart.SeriesCollection.newSeries
+    Set s = ceChart_.SeriesCollection.newSeries
     s.Name = "Coulombic efficiency"
     s.XValues = outputRange.Columns(1).Offset(1).Resize(outputRange.Rows.Count - 1, 1)
     s.values = outputRange.Columns(4).Offset(1).Resize(outputRange.Rows.Count - 1, 1)
     s.AxisGroup = xlSecondary
-    
-    ' ƒOƒ‰ƒt®Œ`
-    Dim chartFormat As New clsScatterChart
-    chartFormat.SetDefault newChart
-    chartFormat.HasLegend = True
-    chartFormat.ApplyTo newChart
-    
-    With newChart
-        .Axes(xlCategory, xlPrimary).TickLabels.NumberFormatLocal = "#,##0"
-        .Axes(xlCategory, xlPrimary).AxisTitle.Text = "Cycle [-]"
-        .Axes(xlValue, xlPrimary).TickLabels.NumberFormatLocal = NUMBER_FORMAT_ZERO_OR_DECIMAL
-        .Axes(xlValue, xlPrimary).AxisTitle.Text = "Discharge capacity"
-        .Axes(xlValue, xlSecondary).TickLabels.NumberFormatLocal = "#,##0"
-        .Axes(xlValue, xlSecondary).AxisTitle.Text = "Coulombic efficiency [%]"
-        .Axes(xlValue, xlSecondary).MaximumScale = 100
-        .Axes(xlValue, xlSecondary).MinimumScale = 0
-        .Axes(xlValue, xlSecondary).MajorUnit = 10
-    End With
 
     aws.Select
 

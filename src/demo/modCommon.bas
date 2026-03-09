@@ -8,31 +8,6 @@ Option Explicit
 ' 色関係の汎用クラス
 Public colorPalette As New clsColorPalette
 
-' 第2軸利用のためのダミー系列名
-Public Const DUMMY_SERIES_NAME As String = "__DUMMY_SERIES_NAME_106841651__"
-
-' 各種既定値
-Public Const DEFAULT_FONT_NAME As String = "Arial Narrow"
-Public Const DEFAULT_FONT_NAME_FAR_EAST As String = "MS UI Gothic"
-Public Const DEFAULT_FONT_SIZE As Single = 16
-Public Const DEFAULT_MARKER_SIZE As Integer = 6
-Public Const DEFAULT_LINE_WEIGHT As Single = 1
-
-' カスタム表示形式
-Public Const NUMBER_FORMAT_ZERO_OR_DECIMAL As String = "[=0]0;0.0"
-
-' グラフタイプ
-Public Enum enChartType
-    Scatter_ = 0
-    Line_
-End Enum
-
-' 充放電
-Public Enum enChargeStatus
-    Charge = 0
-    Discharge
-End Enum
-
 ' 数字オンリーテキストボックスの汎用KeyPress
 Public Function IsValidNumericKeyPress( _
     ByVal KeyAscii As Integer, _

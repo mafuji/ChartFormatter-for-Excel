@@ -41,6 +41,19 @@ Sub CreateToolbar()
     End With
     bar.CreateBar
     
+    If Not IsLatestVersion Then
+        barNo = barNo + 1
+        Set bar = New clsCommandBar
+        With bar
+            .No = barNo
+            .Caption = "ChartFormatterの新しいバージョンがあります"
+            .OnAction = "OpenReleaseSite"
+            .Style = msoButtonIconAndCaption
+            .FaceId = 487
+        End With
+        bar.CreateBar
+    End If
+    
 End Sub
 
 Sub DeleteToolBar()
