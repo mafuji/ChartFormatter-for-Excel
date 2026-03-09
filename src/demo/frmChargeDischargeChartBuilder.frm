@@ -3,8 +3,8 @@ Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmChargeDischargeChartBuilder
    Caption         =   "充放電グラフ作成"
    ClientHeight    =   7776
    ClientLeft      =   120
-   ClientTop       =   468
-   ClientWidth     =   14652
+   ClientTop       =   465
+   ClientWidth     =   14655
    OleObjectBlob   =   "frmChargeDischargeChartBuilder.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
