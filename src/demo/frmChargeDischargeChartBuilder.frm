@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmChargeDischargeChartBuilder 
    Caption         =   "[•ú“dƒOƒ‰ƒtì¬"
-   ClientHeight    =   7776
+   ClientHeight    =   7785
    ClientLeft      =   120
    ClientTop       =   465
    ClientWidth     =   14655
