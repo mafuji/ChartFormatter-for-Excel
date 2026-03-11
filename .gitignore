@@ -1,0 +1,7 @@
+# Visual Studio の一時ファイルとキャッシュ
+.vs/
+obj/
+bin/
+*.user
+*.suo
+*.sln.docstates
