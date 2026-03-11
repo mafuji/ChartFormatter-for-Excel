@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,16 +15,21 @@ namespace ChartFormatterSetup
     public partial class MainForm : Form
     {
         private readonly AddInService _service;
+        private System.Windows.Forms.Timer _timer;
 
         public MainForm()
         {
             InitializeComponent();
             _service = new AddInService(); // インスタンス化
+            _timer = new System.Windows.Forms.Timer();
+            _timer.Interval = 1000; // 1秒ごとに監視
+            _timer.Tick += (s, e) => RefreshUI();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             RefreshUI();
+            _timer.Start();
         }
 
         private void RefreshUI()
@@ -68,6 +74,8 @@ namespace ChartFormatterSetup
 
         private void btnInstallOrUpdate_Click(object sender, EventArgs e)
         {
+            _timer.Stop();
+
             // 1. 実行前に確認（現在のボタンテキストを取得してメッセージに反映）
             string actionName = btnInstallOrUpdate.Text; // "インストール" または "アップデート"
             var result = MessageBox.Show(
@@ -76,7 +84,11 @@ namespace ChartFormatterSetup
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
-            if (result != DialogResult.Yes) return;
+            if (result != DialogResult.Yes)
+            {
+                _timer.Start();
+                return;
+            }
 
             try
             {
@@ -96,9 +108,8 @@ namespace ChartFormatterSetup
                 MessageBox.Show($"{actionName}失敗：\n{ex.Message}",
                     "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                // 失敗したときは、RefreshUIを呼んでボタンを再度有効化するなど、
-                // ユーザーが再試行できるようにアプリを閉じない方が良いかもしれません
-                RefreshUI();
+                // 失敗したときは、RefreshUI
+                _timer.Start();
             }
             finally
             {
@@ -108,12 +119,18 @@ namespace ChartFormatterSetup
 
         private void btnUninstall_Click(object sender, EventArgs e)
         {
+            _timer.Stop();
+
             var result = MessageBox.Show(
                 "アドインを削除しますか？", "確認",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question
             );
 
-            if (result != DialogResult.Yes) return;
+            if (result != DialogResult.Yes)
+            {
+                _timer.Start();
+                return;
+            }
 
             try
             {
@@ -136,7 +153,7 @@ namespace ChartFormatterSetup
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
 
-                RefreshUI(); // 状態を再確認
+                _timer.Start();
             }
             finally
             {
