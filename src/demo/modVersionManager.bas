@@ -5,7 +5,7 @@ Option Explicit
 ' バージョン管理モジュール
 '---------------------------------------------------------------
 
-Private Const myVersion As String = "v1.5.0"
+Private Const myVersion As String = "v1.5.1"
 Private Const latestVerUrl As String = "https://raw.githubusercontent.com/mafuji/ChartFormatter-for-Excel/main/version.txt"
 Private Const releaseUrl As String = "https://github.com/mafuji/ChartFormatter-for-Excel/releases"
 
