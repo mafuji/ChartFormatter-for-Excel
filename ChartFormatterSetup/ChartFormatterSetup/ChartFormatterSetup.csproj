@@ -22,10 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resourse\icon.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="..\..\bin\ChartFormatter.xlam" Link="ChartFormatter.xlam">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -44,6 +40,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resourse\" />
   </ItemGroup>
 
 </Project>
