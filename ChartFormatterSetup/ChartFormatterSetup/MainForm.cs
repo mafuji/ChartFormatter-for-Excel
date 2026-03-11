@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,16 +15,21 @@ namespace ChartFormatterSetup
     public partial class MainForm : Form
     {
         private readonly AddInService _service;
+        private System.Windows.Forms.Timer _timer;
 
         public MainForm()
         {
             InitializeComponent();
             _service = new AddInService(); // インスタンス化
+            _timer = new System.Windows.Forms.Timer();
+            _timer.Interval = 1000; // 1秒ごとに監視
+            _timer.Tick += (s, e) => RefreshUI();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             RefreshUI();
+            _timer.Start();
         }
 
         private void RefreshUI()
