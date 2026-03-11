@@ -24,7 +24,13 @@ Public Function IsLatestVersion() As Boolean
     http.Send
     
     If http.Status = 200 Then
-        latestVersion = http.ResponseText
+        Dim txt As String
+        txt = Trim(http.ResponseText)
+        txt = Replace(txt, vbCrLf, "")
+        txt = Replace(txt, vbCr, "")
+        txt = Replace(txt, vbLf, "")
+        latestVersion = txt
+        
         If myVersion < latestVersion Then
             result = False
         End If
