@@ -1,0 +1,131 @@
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Windows.Forms;
+
+namespace MyAddinSetup
+{
+    static class Program
+    {
+        [STAThread]
+        static void Main(string[] args)
+        {
+            // 引数に "bomb" があるか確認
+            if (args.Contains("bomb"))
+            {
+                // 自動更新モード (UIは出さずにコンソール/バックグラウンドで処理)
+                RunSilentUpdate(args);
+            }
+            else
+            {
+                // 通常のGUIモード
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new MainForm());
+            }
+        }
+
+        static void RunSilentUpdate(string[] args)
+        {
+            // 引数のパース (VBA側と順序を合わせる)
+            // args[0] = "bomb"
+            // args[1] = 更新対象の .xlam フルパス
+            // args[2] = ダウンロードされた .zip フルパス
+            if (args.Length < 3) return;
+
+            string targetXlamPath = args[1];
+            string zipPath = args[2];
+            string currentExeDir = AppDomain.CurrentDomain.BaseDirectory;
+            string newXlamSource = Path.Combine(currentExeDir, Path.GetFileName(targetXlamPath));
+
+            try
+            {
+                // 1. Excelが閉じるまで待機 (最大10秒)
+                if (!WaitForFileUnlock(targetXlamPath, 10))
+                {
+                    // タイムアウトした場合は諦める
+                    return;
+                }
+
+                // 2. 本体(.xlam)の上書きコピー
+                if (File.Exists(newXlamSource))
+                {
+                    File.Copy(newXlamSource, targetXlamPath, true);
+                    
+                    // MotW解除 (代替データストリームの削除)
+                    // C#ならこれを呼ぶだけでOK
+                    RemoveZoneIdentifier(targetXlamPath);
+                }
+
+                // 3. 自爆バッチの実行準備
+                SelfDestruct(currentExeDir, zipPath);
+            }
+            catch (Exception ex)
+            {
+                // サイレントモードなのでログを出すか、そっと閉じる
+                Debug.WriteLine(ex.Message);
+            }
+            finally
+            {
+                Environment.Exit(0);
+            }
+        }
+
+        // ファイルがロック解除されるまでリトライする
+        static bool WaitForFileUnlock(string filePath, int timeoutSeconds)
+        {
+            for (int i = 0; i < timeoutSeconds; i++)
+            {
+                try
+                {
+                    using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                    {
+                        return true; // 開ければロック解除されている
+                    }
+                }
+                catch (IOException)
+                {
+                    Thread.Sleep(1000); // 1秒待機
+                }
+            }
+            return false;
+        }
+
+        // Zone.Identifier (MotW) を削除する
+        static void RemoveZoneIdentifier(string filePath)
+        {
+            string zoneFile = filePath + ":Zone.Identifier";
+            if (NativeMethods.DeleteFile(zoneFile)) 
+            {
+                Debug.WriteLine("MotW removed.");
+            }
+        }
+
+        // 自爆バッチを投げて終了
+        static void SelfDestruct(string workDir, string zipFile)
+        {
+            // 親フォルダ(AppUpdate_Test)ごと消し去る
+            // timeout /t 2 で自身が終了するのを待ち、rd /s /q でディレクトリごと削除
+            string parentDir = Directory.GetParent(workDir.TrimEnd('\\')).FullName;
+            
+            string cmd = $"/c timeout /t 2 > nul && rd /s /q \"{parentDir}\"";
+            
+            ProcessStartInfo psi = new ProcessStartInfo("cmd.exe", cmd)
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+            Process.Start(psi);
+        }
+    }
+
+    // Win32 API
+    internal static class NativeMethods
+    {
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        public static extern bool DeleteFile(string name);
+    }
+}
