@@ -160,5 +160,38 @@ namespace ChartFormatterSetup
                 Cursor.Current = Cursors.Default;
             }
         }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var ctx = AppState.StartupContext!;
+
+            if (ctx.IsBomb && ctx.IsTargetMyFolder())
+            {
+                KillMyFolder();
+            }
+        }
+        private void KillMyFolder()
+        {
+            string targetDir = Application.StartupPath;
+            string batPath = Path.Combine(Path.GetTempPath(), "selfdelete.bat");
+
+            // バッチ内容
+            string bat =
+$@"@echo off
+timeout 1 >nul
+rmdir /S /Q ""{targetDir}""
+del ""%~f0""";
+
+            // バッチを書き出す
+            File.WriteAllText(batPath, bat, System.Text.Encoding.ASCII);
+
+            // バッチを非表示で実行
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = batPath,
+                CreateNoWindow = true,
+                UseShellExecute = false
+            });
+        }
     }
 }
