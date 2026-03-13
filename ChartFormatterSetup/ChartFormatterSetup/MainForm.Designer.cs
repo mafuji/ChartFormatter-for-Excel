@@ -38,10 +38,9 @@
             // 
             // btnInstallOrUpdate
             // 
-            btnInstallOrUpdate.Location = new Point(394, 259);
-            btnInstallOrUpdate.Margin = new Padding(3, 4, 3, 4);
+            btnInstallOrUpdate.Location = new Point(345, 261);
             btnInstallOrUpdate.Name = "btnInstallOrUpdate";
-            btnInstallOrUpdate.Size = new Size(86, 31);
+            btnInstallOrUpdate.Size = new Size(75, 23);
             btnInstallOrUpdate.TabIndex = 0;
             btnInstallOrUpdate.Text = "インストール";
             btnInstallOrUpdate.UseVisualStyleBackColor = true;
@@ -49,10 +48,9 @@
             // 
             // btnClose
             // 
-            btnClose.Location = new Point(487, 259);
-            btnClose.Margin = new Padding(3, 4, 3, 4);
+            btnClose.Location = new Point(426, 261);
             btnClose.Name = "btnClose";
-            btnClose.Size = new Size(86, 31);
+            btnClose.Size = new Size(75, 23);
             btnClose.TabIndex = 1;
             btnClose.Text = "閉じる";
             btnClose.UseVisualStyleBackColor = true;
@@ -61,28 +59,25 @@
             // lblGuide
             // 
             lblGuide.Dock = DockStyle.Fill;
-            lblGuide.Location = new Point(3, 24);
+            lblGuide.Location = new Point(3, 19);
             lblGuide.Name = "lblGuide";
-            lblGuide.Size = new Size(553, 207);
+            lblGuide.Size = new Size(483, 221);
             lblGuide.TabIndex = 2;
             // 
             // groupBox1
             // 
             groupBox1.Controls.Add(lblGuide);
-            groupBox1.Location = new Point(14, 16);
-            groupBox1.Margin = new Padding(3, 4, 3, 4);
+            groupBox1.Location = new Point(12, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Padding = new Padding(3, 4, 3, 4);
-            groupBox1.Size = new Size(559, 235);
+            groupBox1.Size = new Size(489, 243);
             groupBox1.TabIndex = 3;
             groupBox1.TabStop = false;
             // 
             // btnUninstall
             // 
-            btnUninstall.Location = new Point(280, 259);
-            btnUninstall.Margin = new Padding(3, 4, 3, 4);
+            btnUninstall.Location = new Point(245, 261);
             btnUninstall.Name = "btnUninstall";
-            btnUninstall.Size = new Size(107, 31);
+            btnUninstall.Size = new Size(94, 23);
             btnUninstall.TabIndex = 4;
             btnUninstall.Text = "アンインストール";
             btnUninstall.UseVisualStyleBackColor = true;
@@ -90,14 +85,13 @@
             // 
             // MainForm
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(586, 304);
+            ClientSize = new Size(513, 296);
             Controls.Add(btnUninstall);
             Controls.Add(groupBox1);
             Controls.Add(btnClose);
             Controls.Add(btnInstallOrUpdate);
-            Margin = new Padding(3, 4, 3, 4);
             Name = "MainForm";
             Text = "ChartFormatterSetup";
             FormClosing += MainForm_FormClosing;

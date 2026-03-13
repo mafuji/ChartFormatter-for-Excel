@@ -5,14 +5,17 @@ Option Explicit
 ' バージョン管理モジュール
 '---------------------------------------------------------------
 
-Private Const myVersion As String = "v1.5.1"
-Private Const latestVerUrl As String = "https://raw.githubusercontent.com/mafuji/ChartFormatter-for-Excel/main/version.txt"
-Private Const releaseUrl As String = "https://github.com/mafuji/ChartFormatter-for-Excel/releases"
+Const MY_VERSION As String = "vXX.XX.XX"
+Const LATEST_VER_URL As String = "https://raw.githubusercontent.com/mafuji/ChartFormatter-for-Excel/main/version.txt"
+Const RELEASE_SITE_URL As String = "https://github.com/mafuji/ChartFormatter-for-Excel/releases"
 
 ' --- 設定項目 ---
-Const OWNER As String = "mafuji"      ' GitHubのユーザー名
-Const REPO As String = "ChartFormatter-for-Excel"        ' リポジトリ名
-Const ZIP_NAME As String = "ChartFormatter_v1.5.1.zip" ' GitHub上のZip名
+Const OWNER As String = "mafuji" ' GitHubのユーザー名
+Const REPO As String = "ChartFormatter-for-Excel" ' リポジトリ名
+Const ZIP_NAME As String = "ChartFormatter.zip" ' GitHub上のZip名
+Const README_NAME As String = "readme.txt" ' readme名
+Const TEMP_FOLDER_NAME As String = "ChartFormatter_0qc34mctq94thm9q" ' zip一時保存用フォルダ名
+Const BOMB As String = "bomb_mc4893thug9m8c58v59m4y9mh" ' 自爆キーワード
 ' ----------------
 
 Public Function IsLatestVersion() As Boolean
@@ -25,7 +28,7 @@ Public Function IsLatestVersion() As Boolean
     Dim http As Object
     Set http = CreateObject("MSXML2.XMLHTTP")
     
-    http.Open "GET", latestVerUrl, False
+    http.Open "GET", LATEST_VER_URL, False
     http.SetRequestHeader "User-Agent", "Excel"
     http.Send
     
@@ -37,7 +40,7 @@ Public Function IsLatestVersion() As Boolean
         txt = Replace(txt, vbLf, "")
         latestVersion = txt
         
-        If myVersion < latestVersion Then
+        If MY_VERSION < latestVersion Then
             result = False
         End If
     End If
@@ -51,24 +54,26 @@ End Function
 Public Sub OpenReleaseSite()
 
     ' GitHubのリリースサイトを開く
-    ThisWorkbook.FollowHyperlink releaseUrl
+    ThisWorkbook.FollowHyperlink RELEASE_SITE_URL
 
 End Sub
 
 Sub UpdateMe()
 
-    If MsgBox("最新版をダウンロードしてアドインを更新します。よろしいですか？" & vbCrLf & _
-              "※今開いているExcelは保存せずに終了されます。", vbYesNo + vbQuestion) = vbNo Then
+    If MsgBox("最新版をダウンロードしてアドインを更新します。よろしいですか？" & vbCrLf & vbCrLf & _
+              "※「はい」を押すと今開いているExcelは全て保存せずに終了され、" & _
+              "最新版のインストーラが起動します。", vbYesNo + vbQuestion) = vbNo Then
         Exit Sub
     End If
 
-    Dim tempDir As String, zipPath As String, extractDir As String
+    Dim tempDir As String, zipPath As String
     Dim latestUrl As String, exePath As String
+    Dim fso As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
     
-    ' 1. パスの設定 (%TEMP%\AppUpdate_Test)
-    tempDir = Environ("TEMP") & "\AppUpdate_Test\"
+    ' 1. パスの設定 (%TEMP%内)
+    tempDir = fso.GetFolder(Environ("TEMP")).Path & "\" & TEMP_FOLDER_NAME & "\"
     zipPath = tempDir & ZIP_NAME
-    extractDir = tempDir & "Extract\"
     
     ' 前回の残骸があれば掃除
     On Error Resume Next
@@ -88,29 +93,44 @@ Sub UpdateMe()
     
     ' 3. ZIPの解凍 (Windows標準機能を利用)
     Debug.Print "Extracting..."
-    If Not Unzip(zipPath, extractDir) Then
+    If Not Unzip(zipPath, tempDir) Then
         MsgBox "解凍に失敗しました。"
+        If fso.FileExists(zipPath) Then fso.DeleteFile zipPath, Force:=True ' Force引数をTrueにすると、読み取り専用ファイルも強制削除
         Exit Sub
     End If
     
+    ' 3-1. ZIPとreadmeの掃除
+    Dim readmePath As String
+    
+    readmePath = tempDir & README_NAME
+    If fso.FileExists(zipPath) Then fso.DeleteFile zipPath, Force:=True
+    If fso.FileExists(readmePath) Then fso.DeleteFile readmePath, Force:=True
+    
     ' 4. EXEの特定とMotW解除 (Zone.Identifierの削除)
     ' ※解凍先フォルダ内の .exe を探す
-    exePath = Dir(extractDir & "*.exe")
+    exePath = Dir(tempDir & "*.exe")
     If exePath <> "" Then
-        exePath = extractDir & exePath
+        exePath = tempDir & exePath
         Debug.Print "Unblocking & Launching: " & exePath
         
         ' MotW解除コマンド (PowerShell経由が最も確実)
         Shell "powershell -Command ""Unblock-File -Path '" & exePath & "'""", vbHide
         
         ' 5. "bomb" 引数付きで実行
-        ' 引数: bomb [TEMPのパス]
         Dim cmd As String
-        cmd = """" & exePath & """ bomb """ & extractDir & """"
+        cmd = """" & exePath & """ " & BOMB
         Shell cmd, vbNormalFocus
         
         ' 6. VBA側を終了
-        ThisWorkbook.Close SaveChanges:=False
+        Dim wb As Workbook
+        
+        For Each wb In Workbooks
+            If wb.Name = ThisWorkbook.Name Then
+                wb.Close SaveChanges:=False
+            End If
+        Next
+        ThisWorkbook.Saved = True
+        Application.Quit
     Else
         MsgBox "EXEが見つかりませんでした。"
     End If
@@ -145,3 +165,5 @@ Function Unzip(zipFile As String, destFolder As String) As Boolean
     shellApp.Namespace(CVar(destFolder)).CopyHere shellApp.Namespace(CVar(zipFile)).Items, 4 + 16
     Unzip = (Err.Number = 0)
 End Function
+
+
