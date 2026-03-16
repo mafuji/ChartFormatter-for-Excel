@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -56,7 +57,12 @@ namespace ChartFormatterSetup
 
             if (isExcelRunning)
             {
-                lblGuide.Text += "\n\n【注意】Excelが起動しています。実行前にExcelを閉じてください。";
+                lblGuide.Text +=
+                    "\n\n---------------------------------------------------------------------\n" +
+                    "【注意】Excelが起動しています。実行前にExcelを閉じてください。\n\n" +
+                    "Excelがバックグラウンドで動作している場合もあります。\n" + 
+                    "画面上にExcelが確認されない状態で数秒待っても実行可能にならない場合は、\n" + 
+                    "タスクマネージャーからExcelのバックグラウンドプロセスを終了させてください。";
                 btnInstallOrUpdate.Enabled = false;
                 btnUninstall.Enabled = false;
             }
@@ -158,6 +164,25 @@ namespace ChartFormatterSetup
             finally
             {
                 Cursor.Current = Cursors.Default;
+            }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            bool isBomb = AppState.Instance.IsBomb;
+            bool isInTemp = AppState.Instance.IsInTemp();
+
+            //// Test from ==============================================
+            //MessageBox.Show(
+            //    $"IsBomb: {isBomb}\n" +
+            //    $"IsInTemp: {isInTemp}",
+            //    "Debug step: FormClosing"
+            //);
+            //// Test to ==============================================
+
+            if (isBomb && isInTemp)
+            {
+                AppState.Instance.ExecuteSelfDestruct();
             }
         }
     }

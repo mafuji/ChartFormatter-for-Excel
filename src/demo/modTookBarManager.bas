@@ -47,7 +47,7 @@ Sub CreateToolbar()
         With bar
             .No = barNo
             .Caption = "ChartFormatterの新しいバージョンがあります"
-            .OnAction = "OpenReleaseSite"
+            .OnAction = "ShowUpdateDialog"
             .Style = msoButtonIconAndCaption
             .FaceId = 487
         End With
