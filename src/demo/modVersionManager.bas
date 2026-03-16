@@ -5,11 +5,13 @@ Option Explicit
 ' バージョン管理モジュール
 '---------------------------------------------------------------
 
-Const MY_VERSION As String = "vXX.XX.XX"
-Const LATEST_VER_URL As String = "https://raw.githubusercontent.com/mafuji/ChartFormatter-for-Excel/main/version.txt"
-Const RELEASE_SITE_URL As String = "https://github.com/mafuji/ChartFormatter-for-Excel/releases"
+Public gLatestVersion As String
+Public Const MY_VERSION As String = "v1.5.1"
+Public Const RELEASE_SITE_URL As String = "https://github.com/mafuji/ChartFormatter-for-Excel/releases"
 
-' --- 設定項目 ---
+Const LATEST_VER_URL As String = "https://raw.githubusercontent.com/mafuji/ChartFormatter-for-Excel/main/version.txt"
+
+' --- 直接更新用の設定項目 ---
 Const OWNER As String = "mafuji" ' GitHubのユーザー名
 Const REPO As String = "ChartFormatter-for-Excel" ' リポジトリ名
 Const ZIP_NAME As String = "ChartFormatter.zip" ' GitHub上のZip名
@@ -20,7 +22,6 @@ Const BOMB As String = "bomb_mc4893thug9m8c58v59m4y9mh" ' 自爆キーワード
 
 Public Function IsLatestVersion() As Boolean
 
-    Dim latestVersion As String
     Dim result As Boolean
     result = True
 
@@ -38,9 +39,9 @@ Public Function IsLatestVersion() As Boolean
         txt = Replace(txt, vbCrLf, "")
         txt = Replace(txt, vbCr, "")
         txt = Replace(txt, vbLf, "")
-        latestVersion = txt
+        gLatestVersion = txt
         
-        If MY_VERSION < latestVersion Then
+        If MY_VERSION < gLatestVersion Then
             result = False
         End If
     End If
@@ -51,20 +52,13 @@ Public Function IsLatestVersion() As Boolean
     
 End Function
 
-Public Sub OpenReleaseSite()
+Sub ShowUpdateDialog()
 
-    ' GitHubのリリースサイトを開く
-    ThisWorkbook.FollowHyperlink RELEASE_SITE_URL
+    frmUpdate.Show
 
 End Sub
 
 Sub UpdateMe()
-
-    If MsgBox("最新版をダウンロードしてアドインを更新します。よろしいですか？" & vbCrLf & vbCrLf & _
-              "※「はい」を押すと今開いているExcelは全て保存せずに終了され、" & _
-              "最新版のインストーラが起動します。", vbYesNo + vbQuestion) = vbNo Then
-        Exit Sub
-    End If
 
     Dim tempDir As String, zipPath As String
     Dim latestUrl As String, exePath As String
