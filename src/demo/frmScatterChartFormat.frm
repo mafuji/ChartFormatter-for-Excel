@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmScatterChartFormat 
    Caption         =   "散布図整形"
-   ClientHeight    =   5076
+   ClientHeight    =   6435
    ClientLeft      =   105
    ClientTop       =   450
    ClientWidth     =   10395
@@ -34,7 +34,7 @@ Private selectedSeriesIdx As Long
 Private selectedListIdx As Long
 Private selectedSeries As New clsScatterSeries
 
-' 対象グラフ
+' --- 対象グラフ ---
 Public Property Get targetChart() As Chart
     Set targetChart = targetChart_
 End Property
@@ -79,7 +79,7 @@ Private Sub UserForm_Activate()
         lblListHeaderDataColumn.Width & ";" & _
         lblListHeaderColor.Width & ";" & _
         lblListHeaderSize.Width & ";" & _
-        lblListHeaderSecond.Width
+        lblListHeaderSecond.Width - 2
     ToggleType ' グラフ種類に応じた設定
     
     ' Scale
@@ -146,44 +146,7 @@ Private Sub btnExecute_Click()
 
 End Sub
 
-Private Sub btnColor_Click()
-
-    Dim rgbValue As Long
-    Dim r As Long, g As Long, b As Long
-    
-    Select Case chartFormat_.Series.ChartType
-        Case Scatter_
-            rgbValue = selectedSeries.MarkerColor
-        Case Line_
-            rgbValue = selectedSeries.LineColor
-    End Select
-    
-    r = rgbValue And &HFF
-    g = (rgbValue \ &H100) And &HFF
-    b = (rgbValue \ &H10000) And &HFF
-
-    Dim response As Long '戻り値。RGB値が10進数で返される
-    
-    If Application.Dialogs(xlDialogEditColor).Show(1, r, g, b) = True Then
-        response = ActiveWorkbook.colors(1)
-        selectedSeries.MarkerColor = response
-        selectedSeries.LineColor = response
-        lblColorDisplay.ForeColor = response
-        lstSeries.List(selectedListIdx, enSeriesListCol.color_) = colorPalette.GetColorName(response)
-    End If
-
-End Sub
-
-Private Sub chkSecondAxis_AfterUpdate()
-
-    With selectedSeries
-        .useSecondAxis = chkSecondAxis.value
-        lstSeries.List(selectedListIdx, enSeriesListCol.useSecondAxis_) = IIf(chkSecondAxis.value, "○", "")
-    End With
-
-End Sub
-
-' グラフの種類
+' --- グラフの種類 ---
 Private Sub optLine_AfterUpdate()
 
     ToggleType
@@ -204,6 +167,7 @@ End Sub
 
 Private Sub ToggleType()
 
+    ' 設定値
     Select Case True
         Case optScatter
             chartFormat_.Series.ChartType = Scatter_
@@ -221,13 +185,22 @@ Private Sub ToggleType()
     Dim sizeValue As Single
     Dim i As Long
     
+    ' UI表示
     Select Case chartFormat_.Series.ChartType
         Case Scatter_
             colorText = "マーカーの色"
             sizeText = "マーカーサイズ"
+            fraMarkerFillType.Visible = True
+            lblMarkerFillType.Visible = True
+            btnMarkerFillNormal.Visible = True
+            btnMarkerFillWhite.Visible = True
         Case Line_
             colorText = "線の色"
             sizeText = "線の幅(pt)"
+            fraMarkerFillType.Visible = False
+            lblMarkerFillType.Visible = False
+            btnMarkerFillNormal.Visible = False
+            btnMarkerFillWhite.Visible = False
     End Select
 
     lblColor.Caption = colorText
@@ -250,11 +223,10 @@ Private Sub ToggleType()
                 .Item(i).index, _
                 .Item(i).Name, _
                 .Item(i).DataColumn, _
-                colorPalette.GetColorName(colorValue), _
+                IIf(.Item(i).MarkerFillType = mftWhite, "(W)", "") & _
+                    colorPalette.GetColorName(colorValue), _
                 sizeValue, _
-                IIf(.Item(i).useSecondAxis, _
-                    "○", "" _
-                ) _
+                IIf(.Item(i).useSecondAxis, "○", "") _
             )
         Next
     End With
@@ -265,7 +237,9 @@ Private Sub ToggleType()
     Else
         chkSecondAxis.Enabled = True
     End If
-    ShowSeriesDetail ' 選択系列の詳細表示
+    
+    ' 選択系列の詳細表示
+    ShowSeriesDetail
 
 End Sub
 
@@ -280,7 +254,7 @@ Private Sub AddRow(lb As MSForms.ListBox, values As Variant)
 
 End Sub
 
-' フォント
+' --- フォント ---
 Private Sub cmbFont_AfterUpdate()
 
     chartFormat_.Font.FontName = cmbFont.value
@@ -293,7 +267,7 @@ Private Sub cmbFontSize_AfterUpdate()
 
 End Sub
 
-' プロットエリア
+' --- プロットエリア ---
 Private Sub txtPlotAreaWidth_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
 
     If Not IsValidNumericKeyPress(KeyAscii, txtPlotAreaWidth, True) Then
@@ -334,7 +308,7 @@ Private Sub txtPlotAreaHeight_AfterUpdate()
     
 End Sub
 
-' 凡例
+' --- 凡例 ---
 Private Sub optHasLegend_AfterUpdate()
 
     ToggleHasLegend
@@ -357,7 +331,7 @@ Private Sub ToggleHasLegend()
 
 End Sub
 
-' 自動スケール設定
+' --- 自動スケール設定 ---
 Private Sub optOriginalX_AfterUpdate()
 
     cmbMarginModeX.Enabled = (optNiceX = True)
@@ -400,7 +374,105 @@ Private Sub cmbMarginModeY_AfterUpdate()
 
 End Sub
 
-' サイズ
+' --- 系列の色 ---
+Private Sub btnColor_Click()
+
+    Dim rgbValue As Long
+    Dim r As Long, g As Long, b As Long
+    
+    Select Case chartFormat_.Series.ChartType
+        Case Scatter_
+            rgbValue = selectedSeries.MarkerColor
+        Case Line_
+            rgbValue = selectedSeries.LineColor
+    End Select
+    
+    r = rgbValue And &HFF
+    g = (rgbValue \ &H100) And &HFF
+    b = (rgbValue \ &H10000) And &HFF
+
+    Dim response As Long '戻り値。RGB値が10進数で返される
+    
+    If Application.Dialogs(xlDialogEditColor).Show(1, r, g, b) = True Then
+        ' RGB値を取得
+        response = ActiveWorkbook.colors(1)
+        
+        ' プロパティ変更
+        selectedSeries.MarkerColor = response
+        selectedSeries.LineColor = response
+        
+        ' UI更新
+        lblColorDisplay.ForeColor = response
+        lstSeries.List(selectedListIdx, enSeriesListCol.color_) = _
+            IIf(selectedSeries.MarkerFillType = mftWhite, "(W)", "") & _
+            colorPalette.GetColorName(response)
+    End If
+
+End Sub
+
+' --- マーカーの塗りつぶし ---
+Private Sub optMarkerFillNormal_Change()
+
+    ToggleSelectedMarkerFillType mftNormal
+
+End Sub
+
+Private Sub optMarkerFillWhite_Change()
+   
+    ToggleSelectedMarkerFillType mftWhite
+
+End Sub
+
+Private Sub ToggleSelectedMarkerFillType(ByVal typeTo As MarkerFillType)
+
+    ' プロパティ変更
+    selectedSeries.MarkerFillType = typeTo
+    
+    ' UI更新
+    lstSeries.List(selectedListIdx, enSeriesListCol.color_) = _
+        IIf(selectedSeries.MarkerFillType = mftWhite, "(W)", "") & _
+        colorPalette.GetColorName(selectedSeries.MarkerColor)
+
+End Sub
+
+Private Sub btnMarkerFillNormal_Click()
+
+    ToggleAllMarkerFillType mftNormal
+
+End Sub
+
+Private Sub btnMarkerFillWhite_Click()
+
+    ToggleAllMarkerFillType mftWhite
+
+End Sub
+
+' 塗りつぶし一括設定
+Private Sub ToggleAllMarkerFillType(ByVal typeTo As MarkerFillType)
+
+    ' プロパティ変更
+    Dim i As Integer
+    
+    For i = 1 To chartFormat_.Series.Count
+        chartFormat_.Series.Item(i).MarkerFillType = typeTo
+    Next
+    
+    ' 系列リストボックスのUI更新
+    Dim s As clsScatterSeries
+    
+    For i = 0 To lstSeries.ListCount - 1
+        Set s = chartFormat_.Series.Item(lstSeries.List(i, 0))
+        lstSeries.List(i, enSeriesListCol.color_) = _
+            IIf(typeTo = mftWhite, "(W)", "") & _
+            colorPalette.GetColorName(s.MarkerColor)
+    Next
+    
+    ' 選択中の系列のUI更新
+    SetMarkerFillOptionUI typeTo
+
+End Sub
+
+' --- 系列のサイズ ---
 Private Sub spnSize_SpinDown()
 
     ChangeSize -IIf(chartFormat_.Series.ChartType = Scatter_, 1, 0.25)
@@ -439,13 +511,24 @@ Private Sub txtSeriesName_AfterUpdate()
 
 End Sub
 
-' 系列選択
-Private Sub lstSeries_Change()
+' --- 第2軸利用 ---
+Private Sub chkSecondAxis_AfterUpdate()
 
+    With selectedSeries
+        .useSecondAxis = chkSecondAxis.value
+        lstSeries.List(selectedListIdx, enSeriesListCol.useSecondAxis_) = IIf(chkSecondAxis.value, "○", "")
+    End With
+
+End Sub
+
+' --- 系列選択 ---
+Private Sub lstSeries_Change()
+    
     ShowSeriesDetail
 
 End Sub
 
+' 選択された系列のプロパティを表示
 Private Sub ShowSeriesDetail()
 
     Dim selectedColor As Long
@@ -480,6 +563,9 @@ Private Sub ShowSeriesDetail()
                 lblColorDisplay.ForeColor = RGB(0, 0, 0)
             End If
             
+            ' 塗りつぶし
+            SetMarkerFillOptionUI .MarkerFillType
+
             ' サイズ
             txtSize.value = selectedSize
             
@@ -490,6 +576,18 @@ Private Sub ShowSeriesDetail()
                 chkSecondAxis.value = False
             End If
         End With
+    End If
+
+End Sub
+
+' --- ヘルパー ---
+' マーカー塗りつぶしオプションのUI更新
+Private Sub SetMarkerFillOptionUI(ByVal typeTo As MarkerFillType)
+
+    If typeTo = mftNormal Then
+        optMarkerFillNormal.value = True
+    ElseIf typeTo = mftWhite Then
+        optMarkerFillWhite.value = True
     End If
 
 End Sub
