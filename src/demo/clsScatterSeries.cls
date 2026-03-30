@@ -23,6 +23,7 @@ Private lineWeight_ As Single
 Private useSecondAxis_ As Boolean
 Private chartType_ As enChartType
 Private isSmooth_ As Boolean
+Private markerFillType_ As MarkerFillType
 
 ' --- index ---
 Public Property Get index() As Long
@@ -114,6 +115,15 @@ Public Property Let IsSmooth(ByVal newIsSmooth As Boolean)
     isSmooth_ = newIsSmooth
 End Property
 
+' --- markerFillType ---
+Public Property Get MarkerFillType() As MarkerFillType
+    MarkerFillType = markerFillType_
+End Property
+
+Public Property Let MarkerFillType(ByVal newMarkerFillType As MarkerFillType)
+    markerFillType_ = newMarkerFillType
+End Property
+
 Public Function Clone() As clsScatterSeries
     
     Dim c As New clsScatterSeries
@@ -168,18 +178,24 @@ Public Sub ApplyTo(ByRef targetSeries As Series)
     With targetSeries
 
         .Name = Me.Name
+        .Format.Line.Weight = Me.LineWeight
+        
         Select Case Me.ChartType
             Case Scatter_
                 .MarkerStyle = xlMarkerStyleCircle
                 .Format.Line.Visible = msoFalse
-                .MarkerBackgroundColor = Me.MarkerColor
+                If MarkerFillType = mftWhite Then
+                    .MarkerBackgroundColor = vbWhite
+                Else
+                    .MarkerBackgroundColor = Me.MarkerColor
+                End If
                 .MarkerForegroundColor = Me.MarkerColor
                 .MarkerSize = Me.MarkerSize
+                
             Case Line_
                 .MarkerStyle = xlMarkerStyleNone
                 .Format.Line.Visible = msoTrue
                 .Format.Line.ForeColor.RGB = Me.LineColor
-                .Format.Line.Weight = Me.LineWeight
                 .Smooth = Me.IsSmooth
         End Select
         .AxisGroup = IIf(Me.useSecondAxis, xlSecondary, xlPrimary)

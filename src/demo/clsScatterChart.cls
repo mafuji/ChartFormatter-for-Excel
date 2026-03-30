@@ -132,6 +132,7 @@ Public Sub SetDefault(ByVal targetChart As Chart)
             Else
                 tmpColor = colorPalette.GetColor(i)
             End If
+            .Item(i).MarkerFillType = mftNormal
             .Item(i).MarkerColor = tmpColor
             .Item(i).LineColor = tmpColor
             .Item(i).MarkerSize = DEFAULT_MARKER_SIZE

@@ -91,6 +91,12 @@ Public Enum LabelFormat
     lfOrdinal = 1 ' 1st,2nd,...
 End Enum
 
+' マーカー塗りつぶしタイプ
+Public Enum MarkerFillType
+    mftNormal = 0 ' 任意の色
+    mftWhite = 1 ' 白抜き
+End Enum
+
 Public Function GetChartExtents(ByVal ch As Chart, ByVal targetAxis As AxisGroupUsage) As ChartExtents
     Dim r As ChartExtents
     Dim s As Series
