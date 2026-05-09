@@ -6,7 +6,7 @@ Option Explicit
 '---------------------------------------------------------------
 
 Public gLatestVersion As String
-Public Const MY_VERSION As String = "v1.6.0"
+Public Const MY_VERSION As String = "v1.7.0"
 Public Const RELEASE_SITE_URL As String = "https://github.com/mafuji/ChartFormatter-for-Excel/releases"
 
 Const LATEST_VER_URL As String = "https://raw.githubusercontent.com/mafuji/ChartFormatter-for-Excel/main/version.txt"

@@ -3,7 +3,7 @@ Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmUpdate
    Caption         =   "アドインの更新"
    ClientHeight    =   3660
    ClientLeft      =   120
-   ClientTop       =   465
+   ClientTop       =   468
    ClientWidth     =   5700
    OleObjectBlob   =   "frmUpdate.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
@@ -39,6 +39,7 @@ Private Sub btnUpdate_Click()
 
     Me.MousePointer = fmMousePointerHourGlass
     lblStatus.Visible = True
+    DoEvents
     UpdateMe
     Me.MousePointer = fmMousePointerDefault
     lblStatus.Visible = False

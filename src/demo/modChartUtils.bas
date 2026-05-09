@@ -19,6 +19,7 @@ Public Const DEFAULT_PLOTAREA_HEIGHT As Double = 230
 
 ' カスタム表示形式
 Public Const NUMBER_FORMAT_ZERO_OR_DECIMAL As String = "[=0]0;0.0"
+Public Const NUMBER_FORMAT_INT As String = "0"
 
 ' グラフタイプ
 Public Enum enChartType

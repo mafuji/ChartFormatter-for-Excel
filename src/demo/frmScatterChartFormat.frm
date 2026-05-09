@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmScatterChartFormat 
    Caption         =   "散布図整形"
-   ClientHeight    =   6435
-   ClientLeft      =   105
-   ClientTop       =   450
-   ClientWidth     =   10395
+   ClientHeight    =   6432
+   ClientLeft      =   108
+   ClientTop       =   456
+   ClientWidth     =   10392
    OleObjectBlob   =   "frmScatterChartFormat.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -222,7 +222,7 @@ Private Sub ToggleType()
             AddRow lstSeries, Array( _
                 .Item(i).index, _
                 .Item(i).Name, _
-                .Item(i).DataColumn, _
+                .Item(i).dataColumn, _
                 IIf(.Item(i).MarkerFillType = mftWhite, "(W)", "") & _
                     colorPalette.GetColorName(colorValue), _
                 sizeValue, _

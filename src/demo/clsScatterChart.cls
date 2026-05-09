@@ -254,7 +254,7 @@ Public Sub ApplyTo(ByRef targetChart As Chart)
     Dim pxPerPt As Double: pxPerPt = 1.333
     Dim axisLabelSpace As Double
     
-    axisLabelSpace = Me.Font.Size * pxPerPt * 3
+    axisLabelSpace = Me.Font.Size * pxPerPt * 4
     Me.PlotArea.Top = axisLabelSpace
     Me.PlotArea.Left = axisLabelSpace
     
