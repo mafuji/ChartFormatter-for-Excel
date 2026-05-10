@@ -24,12 +24,21 @@ Private stepStartCell_ As range
 Private vStartCell_ As range
 Private ahStartCell_ As range
 
+' ’²®
 Private startStep_ As enChargeStatus ' ŠJnƒXƒeƒbƒv:1,2,3,4
 Private cycleCount_ As Long ' Å‘åƒTƒCƒNƒ‹”iw’èj
 Private useDisplayCycleAdjust_ As Boolean ' •\¦ƒTƒCƒNƒ‹’²®‹@”\g—pƒtƒ‰ƒO
 Private alwaysDisplayCycle_ As Long ' •K{•\¦‚ÌƒTƒCƒNƒ‹1`x‚Ü‚Å•K{•\¦
 Private displayCycleInterval_ As Long ' ƒTƒCƒNƒ‹”‚Ì•\¦ŠÔŠu:2‚È‚ç2,4,6,8,...‚ğŒn—ñ‚Æ‚µ‚Ä•\¦
 
+' ’PˆÊ•ÏŠ·
+Private headerRow_ As Long
+Private ahUnitConvert_ As Boolean
+Private ahUnitConvertRate_ As Long
+Private vUnitConvert_ As Boolean
+Private vUnitConvertRate_ As Long
+
+' ƒJƒ‰[ƒo[ŠÖŒW
 Private colorBar_ As New clsColorBar
 Private colorBarWidthAuto_ As Boolean
 Private colorBarLengthAuto_ As Boolean
@@ -47,6 +56,13 @@ Private chargeDischargeSeries_() As New clsChargeDischargeSeries ' Œn—ñî•ñ‚Ìƒoƒ
 '   3:(charge[AH]/discharge[AH])*100
 Private dataBuffer_() As Variant
 Private ceChart_ As Chart
+
+Private Sub Class_Initialize()
+
+    ahUnitConvert_ = False
+    vUnitConvert_ = False
+
+End Sub
 
 Public Property Get targetChart() As Chart
     Set targetChart = targetChart_
@@ -184,9 +200,75 @@ Public Property Set CeChart(ByVal newCeChart As Chart)
     Set ceChart_ = newCeChart
 End Property
 
+Public Property Get AhUnitConvert() As Boolean
+    AhUnitConvert = ahUnitConvert_
+End Property
+
+Public Property Get VUnitConvert() As Boolean
+    VUnitConvert = vUnitConvert_
+End Property
+
+Public Property Let HeaderRow(ByVal newHeaderRow As Long)
+    headerRow_ = newHeaderRow
+End Property
+
 Public Sub DeleteChart()
 
     Me.targetChart.Parent.Delete
+
+End Sub
+
+' Ah’PˆÊ•ÏŠ· @ƒoƒŠƒG[ƒVƒ‡ƒ“‚Â‚¯‚é‚È‚çˆø”’Ç‰Á
+Public Sub ConvertAhUnit(ByVal unitConvertRate As Long, ByVal dataColumn As String)
+
+    ' ’PˆÊ•ÏŠ·ƒtƒ‰ƒO,İ’è’l
+    ahUnitConvert_ = True
+    ahUnitConvertRate_ = unitConvertRate
+
+    ' ƒf[ƒ^‚ğƒZƒbƒg
+    Dim colNumber As Long
+    Dim lastRow As Long
+    
+    colNumber = range(dataColumn & "1").Column ' •ÏŠ·Œãƒf[ƒ^‚Ì—ñ”Ô†
+    lastRow = Cells(Rows.Count, ahStartCell_.Column).End(xlUp).Row ' ÅIs
+    
+    Dim rngConvertedData As range
+    
+    Set rngConvertedData = range(Cells(ahStartCell_.Row, colNumber), Cells(lastRow, colNumber))
+    rngConvertedData.Formula = "=" & ahStartCell_.Address(False, False) & "*" & unitConvertRate
+    
+    ' Œ©o‚µ
+    Cells(headerRow_, rngConvertedData.Column) = Cells(headerRow_, ahStartCell_.Column) & "~" & unitConvertRate
+    
+    ' ”ÍˆÍ‚ğƒXƒ‰ƒCƒh
+    Set ahStartCell_ = Cells(ahStartCell_.Row, colNumber)
+
+End Sub
+
+' V’PˆÊ•ÏŠ· @ƒoƒŠƒG[ƒVƒ‡ƒ“‚Â‚¯‚é‚È‚çˆø”’Ç‰Á
+Public Sub ConvertVUnit(ByVal unitConvertRate As Long, ByVal dataColumn As String)
+
+    ' ’PˆÊ•ÏŠ·ƒtƒ‰ƒO,İ’è’l
+    vUnitConvert_ = True
+    vUnitConvertRate_ = unitConvertRate
+
+    ' ƒf[ƒ^‚ğƒZƒbƒg
+    Dim colNumber As Long
+    Dim lastRow As Long
+    
+    colNumber = range(dataColumn & "1").Column ' •ÏŠ·Œãƒf[ƒ^‚Ì—ñ”Ô†
+    lastRow = Cells(Rows.Count, vStartCell_.Column).End(xlUp).Row ' ÅIs
+    
+    Dim rngConvertedData As range
+    
+    Set rngConvertedData = range(Cells(vStartCell_.Row, colNumber), Cells(lastRow, colNumber))
+    rngConvertedData.Formula = "=" & vStartCell_.Address(False, False) & "*" & unitConvertRate
+    
+    ' Œ©o‚µ
+    Cells(headerRow_, rngConvertedData.Column) = Cells(headerRow_, vStartCell_.Column) & "~" & unitConvertRate
+    
+    ' ”ÍˆÍ‚ğƒXƒ‰ƒCƒh
+    Set vStartCell_ = Cells(vStartCell_.Row, colNumber)
 
 End Sub
 

@@ -44,11 +44,11 @@ Public Property Let Name(ByVal newName As String)
 End Property
 
 ' --- dataColumn ---
-Public Property Get DataColumn() As String
-    DataColumn = dataColumn_
+Public Property Get dataColumn() As String
+    dataColumn = dataColumn_
 End Property
 
-Public Property Let DataColumn(ByVal newDataColumn As String)
+Public Property Let dataColumn(ByVal newDataColumn As String)
     dataColumn_ = newDataColumn
 End Property
 
@@ -168,7 +168,7 @@ Public Sub LoadFromSeries(ByVal SeriesIndex As Integer, ByVal targetSeries As Se
     
     Set rng = GetRangeFromSeries(targetSeries, 2)
     If Not rng Is Nothing Then
-        Me.DataColumn = GetColumnLetter(rng)
+        Me.dataColumn = GetColumnLetter(rng)
     End If
 
 End Sub
