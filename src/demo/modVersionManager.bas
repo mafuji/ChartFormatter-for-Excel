@@ -119,7 +119,7 @@ Sub UpdateMe()
         Dim wb As Workbook
         
         For Each wb In Workbooks
-            If wb.Name = ThisWorkbook.Name Then
+            If wb.Name <> ThisWorkbook.Name Then
                 wb.Close SaveChanges:=False
             End If
         Next

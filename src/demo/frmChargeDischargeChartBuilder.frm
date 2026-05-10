@@ -53,7 +53,7 @@ Private Sub UserForm_Initialize()
     chargeDischargeChart.StartStep = IIf(optCharge, Charge, Discharge)
     
     ' 単位変換既定設定
-    txtVUnitConvertedText = "mV"
+    txtVUnitConvertedText = "V"
     txtVUnitConvertedDataColumn = "K"
     txtAhUnitConvertedText = "mAh"
     txtAhUnitConvertedDataColumn = "L"
@@ -106,6 +106,26 @@ Private Sub UserForm_Initialize()
 End Sub
 
 ' 単位変換
+Private Sub chkAhUnitConvert_AfterUpdate()
+
+    If chkAhUnitConvert = True Then
+        txtAhUnitConvertedText = "mAh"
+    Else
+        txtAhUnitConvertedText = "Ah"
+    End If
+
+End Sub
+
+Private Sub chkVUnitConvert_AfterUpdate()
+
+    If chkVUnitConvert = True Then
+        txtVUnitConvertedText = "mV"
+    Else
+        txtVUnitConvertedText = "V"
+    End If
+
+End Sub
+
 Private Sub txtAhUnitConvertedDataColumn_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
 
     If IsValidColumnKeyPress(KeyAscii, txtAhUnitConvertedDataColumn) = False Then
@@ -1122,15 +1142,13 @@ Private Sub btnExecute_Click()
         .Axes(xlCategory, xlPrimary).TickLabels.NumberFormatLocal = _
             IIf(chargeDischargeChart.AhUnitConvert, NUMBER_FORMAT_INT, NUMBER_FORMAT_ZERO_OR_DECIMAL)
         .Axes(xlCategory, xlPrimary).HasTitle = True
-        .Axes(xlCategory, xlPrimary).AxisTitle.Text = "Capacity" & _
-            IIf(chargeDischargeChart.AhUnitConvert, " [" & txtAhUnitConvertedText & "]", "")
+        .Axes(xlCategory, xlPrimary).AxisTitle.Text = "Capacity [" & txtAhUnitConvertedText & "]"
         
         ' Cell voltage(V)
         .Axes(xlValue, xlPrimary).TickLabels.NumberFormatLocal = _
             IIf(chargeDischargeChart.VUnitConvert, NUMBER_FORMAT_INT, NUMBER_FORMAT_ZERO_OR_DECIMAL)
         .Axes(xlValue, xlPrimary).HasTitle = True
-        .Axes(xlValue, xlPrimary).AxisTitle.Text = "Cell voltage" & _
-            IIf(chargeDischargeChart.VUnitConvert, " [" & txtVUnitConvertedText & "]", "")
+        .Axes(xlValue, xlPrimary).AxisTitle.Text = "Cell voltage [" & txtVUnitConvertedText & "]"
     End With
     
     ' グラフ①フォーマット適用
@@ -1153,9 +1171,8 @@ Private Sub btnExecute_Click()
         .Axes(xlCategory, xlPrimary).TickLabels.NumberFormatLocal = NUMBER_FORMAT_INT
         .Axes(xlCategory, xlPrimary).AxisTitle.Text = "Cycle [-]"
         .Axes(xlValue, xlPrimary).TickLabels.NumberFormatLocal = _
-            IIf(chargeDischargeChart.VUnitConvert, NUMBER_FORMAT_INT, NUMBER_FORMAT_ZERO_OR_DECIMAL)
-        .Axes(xlValue, xlPrimary).AxisTitle.Text = "Discharge capacity" & _
-            IIf(chargeDischargeChart.AhUnitConvert, " [" & txtAhUnitConvertedText & "]", "")
+            IIf(chargeDischargeChart.AhUnitConvert, NUMBER_FORMAT_INT, NUMBER_FORMAT_ZERO_OR_DECIMAL)
+        .Axes(xlValue, xlPrimary).AxisTitle.Text = "Discharge capacity [" & txtAhUnitConvertedText & "]"
         .Axes(xlValue, xlSecondary).TickLabels.NumberFormatLocal = NUMBER_FORMAT_INT
         .Axes(xlValue, xlSecondary).AxisTitle.Text = "Coulombic efficiency [%]"
         .Axes(xlValue, xlSecondary).MaximumScale = 100
